@@ -1,0 +1,120 @@
+{
+  "synthetic": true,
+  "proposed": true,
+  "identity": "900000000000000001",
+  "examples": [
+    {
+      "file": "examples/daily.request.json",
+      "definition": "Batch",
+      "sha256": "fff5cfe13012810bc08d0a25904d45900126ce0b58959fe384641e56b157bcae",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/daily"
+    },
+    {
+      "file": "examples/daily.receipt.json",
+      "definition": "Receipt",
+      "sha256": "17c1b0a03cd3b16d1c84d61a08de6e86c7c908dc14621914d4327c769fd08c1d"
+    },
+    {
+      "file": "examples/confirmation.request.json",
+      "definition": "Batch",
+      "sha256": "67c1b179e24f2f1430213d0d705068d1baa8827dfab8cb8198dbbd24a59e030f",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/daily"
+    },
+    {
+      "file": "examples/confirmation.receipt.json",
+      "definition": "Receipt",
+      "sha256": "cc5b4444aa8d2c0a681aea62e69525fe21851c3df3a6b434af851ca67662bbb8"
+    },
+    {
+      "file": "examples/revocation.request.json",
+      "definition": "Batch",
+      "sha256": "daa68b0e7525a9442b445ea903697ed2a7d6eb41baed7fb3f2e2de328262553a",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/daily"
+    },
+    {
+      "file": "examples/revocation.receipt.json",
+      "definition": "Receipt",
+      "sha256": "793bf0371c20afcc39c6289c6a27aee09f9e5e79c2ed2ab3d1e026a452c90bcc"
+    },
+    {
+      "file": "examples/correction.request.json",
+      "definition": "Batch",
+      "sha256": "1e0f0fd1b0b8a6d26a057e1ec241306f07546ce7d1be3d9f7a1b47b65d557945",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/daily"
+    },
+    {
+      "file": "examples/correction.receipt.json",
+      "definition": "Receipt",
+      "sha256": "f8fc8a3e9d32835ca1cfe03d18a2a23c3ea28adcb6b31b5a7371738d580b0e01"
+    },
+    {
+      "file": "examples/revision-seed.request.json",
+      "definition": "Batch",
+      "sha256": "5b3c715bb49569ebe3c8cbe6582e12099c5762dd75a1dbdf9c4d06e69cdf5f27",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/daily"
+    },
+    {
+      "file": "examples/revision-seed.receipt.json",
+      "definition": "Receipt",
+      "sha256": "df519c9b2af5cc7474c2e808da5e3b0584ee75fefe3d25afc873440dca83632c"
+    },
+    {
+      "file": "examples/current.request.json",
+      "definition": "Batch",
+      "sha256": "ababbaf8bb1881af29d0cb00332f3bcf029bb65731cec1638b8ca88803ae7536",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/current"
+    },
+    {
+      "file": "examples/current.receipt.json",
+      "definition": "Receipt",
+      "sha256": "cb71ea59d038079af769deee1702a15afa306d0576ffd477bb1cf486d7c80106"
+    },
+    {
+      "file": "examples/coverage.request.json",
+      "definition": "Batch",
+      "sha256": "0cedac20b52410b732e3c0cf6238969ef2f8a3afcdde5fbd48cfdeccea6654d9",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/coverage"
+    },
+    {
+      "file": "examples/coverage.receipt.json",
+      "definition": "Receipt",
+      "sha256": "7b200dbbc26bc53c6e8d98c1dc26425b0519b4451a9db5a9ef21946c7a304f92"
+    },
+    {
+      "file": "examples/status.request.json",
+      "definition": "Batch",
+      "sha256": "58369453f693aece90a22bbfda83593fbb8f59f66f544b9f0c29d9bb3f9233c6",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/status"
+    },
+    {
+      "file": "examples/status.receipt.json",
+      "definition": "Receipt",
+      "sha256": "5ad3ac8259924e5f5996964b3ee7f34508fc65958bc5018b324515fa3a9757c0"
+    },
+    {
+      "file": "examples/reconcile.request.json",
+      "definition": "ReconcileRequest",
+      "sha256": "975cded04e3bbb40b356fbba449f45374fc130ca80815cd03668892059460fc3",
+      "method": "POST",
+      "path": "/api/ingest/v1/tsetmc/reconcile"
+    },
+    {
+      "file": "examples/reconcile.response.json",
+      "definition": "ReconcileResponse",
+      "sha256": "8aa9e7e599a2974fc88f81b3f142db1a606fe60c1d5c29f2856c1bbf7fe68e46"
+    },
+    {
+      "file": "examples/error.response.json",
+      "definition": "Error",
+      "sha256": "6bee18446a6b719f619f6298bb085060e7f7c583190fee4e5cf69f1b6cda8987"
+    }
+  ]
+}

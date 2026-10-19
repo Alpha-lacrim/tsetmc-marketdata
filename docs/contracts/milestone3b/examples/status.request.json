@@ -1,0 +1,45 @@
+{
+  "batch_id": "bf3ffae7-f73b-55b8-bee7-001bf6b03953",
+  "contract_version": "tsetmc.v1",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "ownership_generation": 1,
+  "producer_id": "20000000-0000-4000-8000-000000000001",
+  "protocol_version": 1,
+  "records": [
+    {
+      "event_type": "status.updated",
+      "kind": "status",
+      "observation": {
+        "accepted_source_at": "2026-03-22T08:59:59Z",
+        "canonical_symbol": "TSETMC:900000000000000001",
+        "captured_at": "2026-03-22T09:00:01Z",
+        "expires_at": "2026-03-22T09:01:01Z",
+        "historical_revision_count": 0,
+        "ins_code": "900000000000000001",
+        "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+        "last_database_commit_at": "2026-03-22T09:00:01Z",
+        "last_financial_change_at": "2026-03-22T09:00:00Z",
+        "last_successful_http_at": "2026-03-22T09:00:00Z",
+        "latest_failure_category": null,
+        "open_quarantine_count": 0,
+        "process_state": "running",
+        "provider": "tsetmc",
+        "provider_symbol": "900000000000000001",
+        "session": {
+          "confidence": "unqualified",
+          "expectation": "UNKNOWN",
+          "provenance_sha256": null,
+          "valid_until": "2026-03-22T09:01:00Z"
+        },
+        "source_availability": "http_observed",
+        "source_instrument_id": "SYNTHETIC-EQUITY-A"
+      },
+      "observation_id": "114b4086-5530-5f36-be55-d2e47d14c6a8",
+      "source_position": "1"
+    }
+  ],
+  "session_generation": 1,
+  "session_id": "40000000-0000-4000-8000-000000000001",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "stream": "tsetmc_status"
+}

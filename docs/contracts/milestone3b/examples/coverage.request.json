@@ -1,0 +1,43 @@
+{
+  "batch_id": "829877ea-3b61-5271-b354-27825e138fe8",
+  "contract_version": "tsetmc.v1",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "ownership_generation": 1,
+  "producer_id": "20000000-0000-4000-8000-000000000001",
+  "protocol_version": 1,
+  "records": [
+    {
+      "event_type": "coverage.updated",
+      "kind": "coverage",
+      "observation": {
+        "archive_completeness": "unproven",
+        "canonical_symbol": "TSETMC:900000000000000001",
+        "captured_at": "2026-03-22T09:00:00Z",
+        "coverage_rows": [
+          {
+            "financial_hash": "dfd78e6a41b2d035f2c90e4da430a3939759a03f07dc7ff7bda9a4d13a2b3deb",
+            "local_finalization": "source_unverified",
+            "state": "observed",
+            "trading_date": "2026-03-21",
+            "upstream_finality": "unverified"
+          }
+        ],
+        "from_date": "2026-03-21",
+        "ins_code": "900000000000000001",
+        "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+        "missing_calendar_dates": "unknown",
+        "provider": "tsetmc",
+        "provider_symbol": "900000000000000001",
+        "range_scope": "observed_dates_only",
+        "source_instrument_id": "SYNTHETIC-EQUITY-A",
+        "through_date": "2026-03-21"
+      },
+      "observation_id": "f3179809-5069-508e-8985-c4471cf4fbf1",
+      "source_position": "1"
+    }
+  ],
+  "session_generation": 1,
+  "session_id": "40000000-0000-4000-8000-000000000001",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "stream": "tsetmc_coverage"
+}

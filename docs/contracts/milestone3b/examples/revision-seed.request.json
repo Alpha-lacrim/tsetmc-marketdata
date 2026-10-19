@@ -1,0 +1,71 @@
+{
+  "batch_id": "e1f81f74-8253-5647-a44b-1503e67850c3",
+  "contract_version": "tsetmc.v1",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "ownership_generation": 1,
+  "producer_id": "20000000-0000-4000-8000-000000000001",
+  "protocol_version": 1,
+  "records": [
+    {
+      "event_type": "daily.revision_seed",
+      "kind": "daily_revision",
+      "observation": {
+        "canonical_symbol": "TSETMC:900000000000000001",
+        "ins_code": "900000000000000001",
+        "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+        "provider": "tsetmc",
+        "provider_symbol": "900000000000000001",
+        "revision_evidence": {
+          "discovered_at": "2026-03-22T08:50:00Z",
+          "financial_revision": "2",
+          "local_revision_id": "1",
+          "new_financial_hash": "79c7086d905b8bfbbe0b9f50d744afeef4f4d315128ceb9ba3688c04fed077fd",
+          "new_measurements": {
+            "high": "110",
+            "last_traded_price": "108",
+            "low": "100",
+            "official_close": "113",
+            "opening_price": "104",
+            "previous_close": "100",
+            "trade_count": "7",
+            "traded_value": "43000",
+            "traded_volume": "400"
+          },
+          "new_source": {
+            "endpoint": "ClosingPrice/GetClosingPriceDaily/900000000000000001/20260321",
+            "local_observation_id": "103",
+            "raw_sha256": "be68dd1eb0e70662494ffe8586137c8ba124b8dacdc80bb9523b4240bc8bad34",
+            "received_at": "2026-03-22T08:00:00Z"
+          },
+          "old_financial_hash": "dfd78e6a41b2d035f2c90e4da430a3939759a03f07dc7ff7bda9a4d13a2b3deb",
+          "old_measurements": {
+            "high": "110",
+            "last_traded_price": "108",
+            "low": "100",
+            "official_close": "112",
+            "opening_price": "104",
+            "previous_close": "100",
+            "trade_count": "7",
+            "traded_value": "43000",
+            "traded_volume": "400"
+          },
+          "old_source": {
+            "endpoint": "ClosingPrice/GetClosingPriceDaily/900000000000000001/20260321",
+            "local_observation_id": "101",
+            "raw_sha256": "9465f563ec787ea8fcced53f494906fa5966cf9e3cdbd165070ffdb8cb5cf349",
+            "received_at": "2026-03-21T10:00:00Z"
+          }
+        },
+        "seed_id": "60000000-0000-4000-8000-000000000001",
+        "source_instrument_id": "SYNTHETIC-EQUITY-A",
+        "trading_date": "2026-03-21"
+      },
+      "observation_id": "ba241bd8-c334-58b6-bd06-86335c862357",
+      "source_position": "5"
+    }
+  ],
+  "session_generation": 1,
+  "session_id": "40000000-0000-4000-8000-000000000001",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "stream": "tsetmc_daily"
+}

@@ -1,0 +1,75 @@
+{
+  "batch_id": "a9563fcc-de49-5df6-ab90-268e371b834a",
+  "contract_version": "tsetmc.v1",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "ownership_generation": 1,
+  "producer_id": "20000000-0000-4000-8000-000000000001",
+  "protocol_version": 1,
+  "records": [
+    {
+      "event_type": "daily.accepted",
+      "kind": "daily",
+      "observation": {
+        "acceptance": "observed",
+        "canonical_symbol": "TSETMC:900000000000000001",
+        "delivery_status": "unknown",
+        "financial_hash": "dfd78e6a41b2d035f2c90e4da430a3939759a03f07dc7ff7bda9a4d13a2b3deb",
+        "financial_revision": "1",
+        "ins_code": "900000000000000001",
+        "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+        "local_finalization": "source_unverified",
+        "measurements": {
+          "high": "110",
+          "last_traded_price": "108",
+          "low": "100",
+          "official_close": "112",
+          "opening_price": "104",
+          "previous_close": "100",
+          "trade_count": "7",
+          "traded_value": "43000",
+          "traded_volume": "400"
+        },
+        "provider": "tsetmc",
+        "provider_symbol": "900000000000000001",
+        "publication_state": "unverified_history",
+        "reconciliation": {
+          "local_decision_id": null,
+          "open_quarantine_count": 0,
+          "status": "not_checked"
+        },
+        "review": null,
+        "revision_evidence": null,
+        "source": {
+          "endpoint": "ClosingPrice/GetClosingPriceDaily/900000000000000001/20260321",
+          "local_observation_id": "101",
+          "raw_sha256": "9465f563ec787ea8fcced53f494906fa5966cf9e3cdbd165070ffdb8cb5cf349",
+          "received_at": "2026-03-21T10:00:00Z"
+        },
+        "source_fields": {
+          "dEven": "20260321",
+          "finalLastDate": null,
+          "hEven": "122959",
+          "lastHEven": null
+        },
+        "source_instrument_id": "SYNTHETIC-EQUITY-A",
+        "state_version": "1",
+        "trading_date": "2026-03-21",
+        "units": {
+          "confidence": "unverified",
+          "evidence_ref": null,
+          "price_currency": "IRR",
+          "profile": "tsetmc_equity_irr_shares_v1",
+          "value_currency": "IRR",
+          "volume_unit": "share"
+        },
+        "upstream_finality": "unverified"
+      },
+      "observation_id": "088479bd-324c-5aac-9eff-00ef3aa74157",
+      "source_position": "1"
+    }
+  ],
+  "session_generation": 1,
+  "session_id": "40000000-0000-4000-8000-000000000001",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "stream": "tsetmc_daily"
+}

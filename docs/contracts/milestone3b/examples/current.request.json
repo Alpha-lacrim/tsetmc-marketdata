@@ -1,0 +1,73 @@
+{
+  "batch_id": "c3b6a7b3-1532-5cd1-bb4a-dc1aeb0170ab",
+  "contract_version": "tsetmc.v1",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "ownership_generation": 1,
+  "producer_id": "20000000-0000-4000-8000-000000000001",
+  "protocol_version": 1,
+  "records": [
+    {
+      "event_type": "current.updated",
+      "kind": "current",
+      "observation": {
+        "accepted_decision": "initial_observation",
+        "canonical_symbol": "TSETMC:900000000000000001",
+        "correction_reason_sha256": null,
+        "delivery_status": "unknown",
+        "financial_change": true,
+        "financial_hash": "468de948494be3625d42c7c6e0f77737f94d2f9a734d1ff7f35ae03670ca4169",
+        "ins_code": "900000000000000001",
+        "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+        "instrument_state": "SYNTHETIC",
+        "instrument_state_title": "Synthetic state, no session inference",
+        "local_snapshot_id": "201",
+        "measurements": {
+          "high": "110",
+          "last_traded_price": "109",
+          "low": "100",
+          "official_close": "111",
+          "opening_price": "104",
+          "previous_close": "100",
+          "trade_count": "7",
+          "traded_value": "43000",
+          "traded_volume": "400"
+        },
+        "new_trade_claimed": false,
+        "observation_semantics": "polled_snapshot",
+        "provider": "tsetmc",
+        "provider_symbol": "900000000000000001",
+        "source": {
+          "endpoint": "ClosingPrice/GetClosingPriceInfo/900000000000000001",
+          "local_observation_id": "201",
+          "raw_sha256": "21b2b6ea548e3f34f31a31d77a1c7a074fbd99b25a64367ad05b236bc44f8b3d",
+          "received_at": "2026-03-22T09:00:00Z"
+        },
+        "source_date": "2026-03-22",
+        "source_fields": {
+          "dEven": "20260322",
+          "finalLastDate": "20260322",
+          "hEven": "122959",
+          "lastHEven": "122959"
+        },
+        "source_instrument_id": "SYNTHETIC-EQUITY-A",
+        "source_reported_at": "2026-03-22T08:59:59Z",
+        "source_time": "12:29:59",
+        "state_version": "1",
+        "units": {
+          "confidence": "unverified",
+          "evidence_ref": null,
+          "price_currency": "IRR",
+          "profile": "tsetmc_equity_irr_shares_v1",
+          "value_currency": "IRR",
+          "volume_unit": "share"
+        }
+      },
+      "observation_id": "9efb0b4a-0ba8-5a0d-b1fb-265983d57724",
+      "source_position": "1"
+    }
+  ],
+  "session_generation": 1,
+  "session_id": "40000000-0000-4000-8000-000000000001",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "stream": "tsetmc_current"
+}

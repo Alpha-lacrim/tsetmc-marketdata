@@ -1,0 +1,32 @@
+{
+  "batch_id": "a9563fcc-de49-5df6-ab90-268e371b834a",
+  "contract_version": "tsetmc.v1",
+  "counts": {
+    "applied": 1,
+    "duplicate": 0,
+    "recorded_no_change": 0,
+    "superseded": 0
+  },
+  "destination_id": "30000000-0000-4000-8000-000000000001",
+  "event_cursor": "dHNldG1jMTo3MDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwMDE6MQ==",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "ownership_generation": 1,
+  "payload_sha256": "fff5cfe13012810bc08d0a25904d45900126ce0b58959fe384641e56b157bcae",
+  "producer_id": "20000000-0000-4000-8000-000000000001",
+  "protocol_version": 1,
+  "records": [
+    {
+      "canonical_updated": true,
+      "observation_id": "088479bd-324c-5aac-9eff-00ef3aa74157",
+      "outcome": "applied",
+      "record_sha256": "8f810d654fb16a16575ef55d475b35e561bc2af7e0ebc3febbc477608f5ae399",
+      "source_position": "1",
+      "stored_financial_hash": "dfd78e6a41b2d035f2c90e4da430a3939759a03f07dc7ff7bda9a4d13a2b3deb",
+      "stored_state_version": "1"
+    }
+  ],
+  "server_ingested_at": "2026-03-22T09:00:02Z",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "state": "committed",
+  "stream": "tsetmc_daily"
+}

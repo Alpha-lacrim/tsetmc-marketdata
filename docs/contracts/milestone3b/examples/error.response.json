@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "observation_payload_conflict",
+    "record_indexes": [
+      0
+    ],
+    "retryable": false
+  }
+}

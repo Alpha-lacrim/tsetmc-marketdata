@@ -1,0 +1,32 @@
+{
+  "batch_id": "e1f81f74-8253-5647-a44b-1503e67850c3",
+  "contract_version": "tsetmc.v1",
+  "counts": {
+    "applied": 0,
+    "duplicate": 0,
+    "recorded_no_change": 1,
+    "superseded": 0
+  },
+  "destination_id": "30000000-0000-4000-8000-000000000001",
+  "event_cursor": null,
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "ownership_generation": 1,
+  "payload_sha256": "5b3c715bb49569ebe3c8cbe6582e12099c5762dd75a1dbdf9c4d06e69cdf5f27",
+  "producer_id": "20000000-0000-4000-8000-000000000001",
+  "protocol_version": 1,
+  "records": [
+    {
+      "canonical_updated": false,
+      "observation_id": "ba241bd8-c334-58b6-bd06-86335c862357",
+      "outcome": "recorded_no_change",
+      "record_sha256": "8156f7ba91a21e7d58351ee9d81753bd28ad0f5af36b9512b449c5cf7dff20f0",
+      "source_position": "5",
+      "stored_financial_hash": null,
+      "stored_state_version": null
+    }
+  ],
+  "server_ingested_at": "2026-03-22T09:00:02Z",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "state": "committed",
+  "stream": "tsetmc_daily"
+}

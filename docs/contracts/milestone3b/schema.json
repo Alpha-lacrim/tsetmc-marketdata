@@ -1,0 +1,2227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tsetmc:proposed:contract:v1",
+  "title": "PROPOSED TSETMC ingestion v1 extension",
+  "$comment": "Design only. Cross-field financial, ownership, clock and hash rules are normative in the wire document.",
+  "$defs": {
+    "Measurements": {
+      "type": "object",
+      "properties": {
+        "previous_close": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "opening_price": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_traded_price": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "high": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "low": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "official_close": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trade_count": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "traded_volume": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "traded_value": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]*[1-9])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "previous_close",
+        "opening_price",
+        "last_traded_price",
+        "high",
+        "low",
+        "official_close",
+        "trade_count",
+        "traded_volume",
+        "traded_value"
+      ],
+      "additionalProperties": false
+    },
+    "Units": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "const": "tsetmc_equity_irr_shares_v1"
+        },
+        "price_currency": {
+          "const": "IRR"
+        },
+        "value_currency": {
+          "const": "IRR"
+        },
+        "volume_unit": {
+          "const": "share"
+        },
+        "confidence": {
+          "enum": [
+            "unverified",
+            "verified"
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "profile",
+        "price_currency",
+        "value_currency",
+        "volume_unit",
+        "confidence",
+        "evidence_ref"
+      ],
+      "additionalProperties": false
+    },
+    "SourceRef": {
+      "type": "object",
+      "properties": {
+        "local_observation_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "raw_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "received_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "local_observation_id",
+        "raw_sha256",
+        "endpoint",
+        "received_at"
+      ],
+      "additionalProperties": false
+    },
+    "SourceFields": {
+      "type": "object",
+      "properties": {
+        "dEven": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hEven": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lastHEven": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "finalLastDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "dEven",
+        "hEven",
+        "lastHEven",
+        "finalLastDate"
+      ],
+      "additionalProperties": false
+    },
+    "Reconciliation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "not_checked",
+            "agrees",
+            "accepted_repair",
+            "unresolved_conflict"
+          ]
+        },
+        "local_decision_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "open_quarantine_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        }
+      },
+      "required": [
+        "status",
+        "local_decision_id",
+        "open_quarantine_count"
+      ],
+      "additionalProperties": false
+    },
+    "Review": {
+      "type": "object",
+      "properties": {
+        "review_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "action": {
+          "enum": [
+            "confirm",
+            "revoke"
+          ]
+        },
+        "policy": {
+          "const": "operator_review_v1"
+        },
+        "reviewed_financial_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        },
+        "evidence_observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,18}$"
+          },
+          "minItems": 0,
+          "maxItems": 2
+        },
+        "policy_evidence_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "review_id",
+        "action",
+        "policy",
+        "reviewed_financial_hash",
+        "reviewed_at",
+        "evidence_observation_ids",
+        "policy_evidence_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionEvidence": {
+      "type": "object",
+      "properties": {
+        "local_revision_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "financial_revision": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "old_financial_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "new_financial_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "old_measurements": {
+          "$ref": "#/$defs/Measurements"
+        },
+        "new_measurements": {
+          "$ref": "#/$defs/Measurements"
+        },
+        "old_source": {
+          "$ref": "#/$defs/SourceRef"
+        },
+        "new_source": {
+          "$ref": "#/$defs/SourceRef"
+        },
+        "discovered_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        }
+      },
+      "required": [
+        "local_revision_id",
+        "financial_revision",
+        "old_financial_hash",
+        "new_financial_hash",
+        "old_measurements",
+        "new_measurements",
+        "old_source",
+        "new_source",
+        "discovered_at"
+      ],
+      "additionalProperties": false
+    },
+    "DailyState": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "const": "tsetmc"
+        },
+        "instrument_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canonical_symbol": {
+          "type": "string",
+          "pattern": "^TSETMC:[1-9][0-9]{0,19}$"
+        },
+        "provider_symbol": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "ins_code": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "source_instrument_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trading_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "measurements": {
+          "$ref": "#/$defs/Measurements"
+        },
+        "units": {
+          "$ref": "#/$defs/Units"
+        },
+        "delivery_status": {
+          "const": "unknown"
+        },
+        "financial_revision": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "state_version": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "financial_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_fields": {
+          "$ref": "#/$defs/SourceFields"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceRef"
+        },
+        "acceptance": {
+          "enum": [
+            "observed",
+            "reconciled"
+          ]
+        },
+        "upstream_finality": {
+          "const": "unverified"
+        },
+        "local_finalization": {
+          "enum": [
+            "source_unverified",
+            "operator_finalized"
+          ]
+        },
+        "publication_state": {
+          "enum": [
+            "provisional",
+            "unverified_history"
+          ]
+        },
+        "reconciliation": {
+          "$ref": "#/$defs/Reconciliation"
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Review"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevisionEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "provider",
+        "instrument_id",
+        "canonical_symbol",
+        "provider_symbol",
+        "ins_code",
+        "source_instrument_id",
+        "trading_date",
+        "measurements",
+        "units",
+        "delivery_status",
+        "financial_revision",
+        "state_version",
+        "financial_hash",
+        "source_fields",
+        "source",
+        "acceptance",
+        "upstream_finality",
+        "local_finalization",
+        "publication_state",
+        "reconciliation",
+        "review",
+        "revision_evidence"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionSeed": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "const": "tsetmc"
+        },
+        "instrument_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canonical_symbol": {
+          "type": "string",
+          "pattern": "^TSETMC:[1-9][0-9]{0,19}$"
+        },
+        "provider_symbol": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "ins_code": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "source_instrument_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trading_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "seed_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision_evidence": {
+          "$ref": "#/$defs/RevisionEvidence"
+        }
+      },
+      "required": [
+        "provider",
+        "instrument_id",
+        "canonical_symbol",
+        "provider_symbol",
+        "ins_code",
+        "source_instrument_id",
+        "trading_date",
+        "seed_id",
+        "revision_evidence"
+      ],
+      "additionalProperties": false
+    },
+    "CurrentState": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "const": "tsetmc"
+        },
+        "instrument_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canonical_symbol": {
+          "type": "string",
+          "pattern": "^TSETMC:[1-9][0-9]{0,19}$"
+        },
+        "provider_symbol": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "ins_code": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "source_instrument_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "local_snapshot_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "observation_semantics": {
+          "const": "polled_snapshot"
+        },
+        "new_trade_claimed": {
+          "const": false
+        },
+        "measurements": {
+          "$ref": "#/$defs/Measurements"
+        },
+        "units": {
+          "$ref": "#/$defs/Units"
+        },
+        "delivery_status": {
+          "const": "unknown"
+        },
+        "state_version": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "financial_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_fields": {
+          "$ref": "#/$defs/SourceFields"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceRef"
+        },
+        "source_date": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_time": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9]{2}:[0-9]{2}:[0-9]{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_reported_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instrument_state": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instrument_state_title": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accepted_decision": {
+          "enum": [
+            "initial_observation",
+            "newer_session",
+            "newer_source_clock",
+            "same_state_more_precise_position",
+            "explicit_same_time_correction",
+            "repeated_state"
+          ]
+        },
+        "financial_change": {
+          "type": "boolean"
+        },
+        "correction_reason_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "provider",
+        "instrument_id",
+        "canonical_symbol",
+        "provider_symbol",
+        "ins_code",
+        "source_instrument_id",
+        "local_snapshot_id",
+        "observation_semantics",
+        "new_trade_claimed",
+        "measurements",
+        "units",
+        "delivery_status",
+        "state_version",
+        "financial_hash",
+        "source_fields",
+        "source",
+        "source_date",
+        "source_time",
+        "source_reported_at",
+        "instrument_state",
+        "instrument_state_title",
+        "accepted_decision",
+        "financial_change",
+        "correction_reason_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "Session": {
+      "type": "object",
+      "properties": {
+        "expectation": {
+          "enum": [
+            "EXPECTED",
+            "NOT_EXPECTED",
+            "UNKNOWN"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "verified_rule",
+            "source_state",
+            "operator",
+            "unqualified",
+            "conflicting_evidence"
+          ]
+        },
+        "provenance_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valid_until": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        }
+      },
+      "required": [
+        "expectation",
+        "confidence",
+        "provenance_sha256",
+        "valid_until"
+      ],
+      "additionalProperties": false
+    },
+    "Status": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "const": "tsetmc"
+        },
+        "instrument_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canonical_symbol": {
+          "type": "string",
+          "pattern": "^TSETMC:[1-9][0-9]{0,19}$"
+        },
+        "provider_symbol": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "ins_code": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "source_instrument_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        },
+        "process_state": {
+          "enum": [
+            "running",
+            "stopped",
+            "failed",
+            "interrupted_owner_absent",
+            "never_started",
+            "unknown"
+          ]
+        },
+        "source_availability": {
+          "enum": [
+            "http_observed",
+            "latest_request_failed",
+            "source_unusable",
+            "application_failure_http_independent",
+            "unknown"
+          ]
+        },
+        "last_successful_http_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_database_commit_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accepted_source_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_financial_change_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "session": {
+          "$ref": "#/$defs/Session"
+        },
+        "latest_failure_category": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "open_quarantine_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "historical_revision_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        }
+      },
+      "required": [
+        "provider",
+        "instrument_id",
+        "canonical_symbol",
+        "provider_symbol",
+        "ins_code",
+        "source_instrument_id",
+        "captured_at",
+        "expires_at",
+        "process_state",
+        "source_availability",
+        "last_successful_http_at",
+        "last_database_commit_at",
+        "accepted_source_at",
+        "last_financial_change_at",
+        "session",
+        "latest_failure_category",
+        "open_quarantine_count",
+        "historical_revision_count"
+      ],
+      "additionalProperties": false
+    },
+    "CoverageRow": {
+      "type": "object",
+      "properties": {
+        "trading_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "state": {
+          "enum": [
+            "observed",
+            "reconciled",
+            "confirmed_no_trade",
+            "quarantined",
+            "unknown"
+          ]
+        },
+        "financial_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upstream_finality": {
+          "const": "unverified"
+        },
+        "local_finalization": {
+          "anyOf": [
+            {
+              "enum": [
+                "source_unverified",
+                "operator_finalized"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "trading_date",
+        "state",
+        "financial_hash",
+        "upstream_finality",
+        "local_finalization"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "const": "tsetmc"
+        },
+        "instrument_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "canonical_symbol": {
+          "type": "string",
+          "pattern": "^TSETMC:[1-9][0-9]{0,19}$"
+        },
+        "provider_symbol": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "ins_code": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "source_instrument_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        },
+        "from_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "through_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "range_scope": {
+          "const": "observed_dates_only"
+        },
+        "archive_completeness": {
+          "const": "unproven"
+        },
+        "missing_calendar_dates": {
+          "const": "unknown"
+        },
+        "coverage_rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CoverageRow"
+          },
+          "minItems": 1,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "provider",
+        "instrument_id",
+        "canonical_symbol",
+        "provider_symbol",
+        "ins_code",
+        "source_instrument_id",
+        "captured_at",
+        "from_date",
+        "through_date",
+        "range_scope",
+        "archive_completeness",
+        "missing_calendar_dates",
+        "coverage_rows"
+      ],
+      "additionalProperties": false
+    },
+    "DailyRecord": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_position": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "kind": {
+          "const": "daily"
+        },
+        "event_type": {
+          "enum": [
+            "daily.accepted",
+            "daily.corrected",
+            "daily.reconciled",
+            "daily.review_confirmed",
+            "daily.review_revoked",
+            "daily.quality_changed",
+            "daily.seed",
+            "daily.resnapshot"
+          ]
+        },
+        "observation": {
+          "$ref": "#/$defs/DailyState"
+        }
+      },
+      "required": [
+        "observation_id",
+        "source_position",
+        "kind",
+        "event_type",
+        "observation"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionRecord": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_position": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "kind": {
+          "const": "daily_revision"
+        },
+        "event_type": {
+          "enum": [
+            "daily.revision_seed"
+          ]
+        },
+        "observation": {
+          "$ref": "#/$defs/RevisionSeed"
+        }
+      },
+      "required": [
+        "observation_id",
+        "source_position",
+        "kind",
+        "event_type",
+        "observation"
+      ],
+      "additionalProperties": false
+    },
+    "CurrentRecord": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_position": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "kind": {
+          "const": "current"
+        },
+        "event_type": {
+          "enum": [
+            "current.updated",
+            "current.seed",
+            "current.resnapshot"
+          ]
+        },
+        "observation": {
+          "$ref": "#/$defs/CurrentState"
+        }
+      },
+      "required": [
+        "observation_id",
+        "source_position",
+        "kind",
+        "event_type",
+        "observation"
+      ],
+      "additionalProperties": false
+    },
+    "CoverageRecord": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_position": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "kind": {
+          "const": "coverage"
+        },
+        "event_type": {
+          "enum": [
+            "coverage.updated"
+          ]
+        },
+        "observation": {
+          "$ref": "#/$defs/Coverage"
+        }
+      },
+      "required": [
+        "observation_id",
+        "source_position",
+        "kind",
+        "event_type",
+        "observation"
+      ],
+      "additionalProperties": false
+    },
+    "StatusRecord": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_position": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "kind": {
+          "const": "status"
+        },
+        "event_type": {
+          "enum": [
+            "status.updated"
+          ]
+        },
+        "observation": {
+          "$ref": "#/$defs/Status"
+        }
+      },
+      "required": [
+        "observation_id",
+        "source_position",
+        "kind",
+        "event_type",
+        "observation"
+      ],
+      "additionalProperties": false
+    },
+    "Batch": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "protocol_version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "contract_version": {
+              "const": "tsetmc.v1"
+            },
+            "producer_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "source_epoch": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "batch_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "instrument_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ownership_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "stream": {
+              "const": "tsetmc_daily"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/DailyRecord"
+                  },
+                  {
+                    "$ref": "#/$defs/RevisionRecord"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 100
+            }
+          },
+          "required": [
+            "protocol_version",
+            "contract_version",
+            "producer_id",
+            "session_id",
+            "session_generation",
+            "source_epoch",
+            "batch_id",
+            "instrument_id",
+            "ownership_generation",
+            "stream",
+            "records"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol_version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "contract_version": {
+              "const": "tsetmc.v1"
+            },
+            "producer_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "source_epoch": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "batch_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "instrument_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ownership_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "stream": {
+              "const": "tsetmc_current"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CurrentRecord"
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "protocol_version",
+            "contract_version",
+            "producer_id",
+            "session_id",
+            "session_generation",
+            "source_epoch",
+            "batch_id",
+            "instrument_id",
+            "ownership_generation",
+            "stream",
+            "records"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol_version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "contract_version": {
+              "const": "tsetmc.v1"
+            },
+            "producer_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "source_epoch": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "batch_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "instrument_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ownership_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "stream": {
+              "const": "tsetmc_coverage"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CoverageRecord"
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "protocol_version",
+            "contract_version",
+            "producer_id",
+            "session_id",
+            "session_generation",
+            "source_epoch",
+            "batch_id",
+            "instrument_id",
+            "ownership_generation",
+            "stream",
+            "records"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol_version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "contract_version": {
+              "const": "tsetmc.v1"
+            },
+            "producer_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "source_epoch": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "batch_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "instrument_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ownership_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "stream": {
+              "const": "tsetmc_status"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/StatusRecord"
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "protocol_version",
+            "contract_version",
+            "producer_id",
+            "session_id",
+            "session_generation",
+            "source_epoch",
+            "batch_id",
+            "instrument_id",
+            "ownership_generation",
+            "stream",
+            "records"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ReceiptRecord": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_position": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,18}$"
+        },
+        "record_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "outcome": {
+          "enum": [
+            "applied",
+            "recorded_no_change",
+            "superseded",
+            "duplicate"
+          ]
+        },
+        "stored_state_version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stored_financial_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "canonical_updated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "observation_id",
+        "source_position",
+        "record_sha256",
+        "outcome",
+        "stored_state_version",
+        "stored_financial_hash",
+        "canonical_updated"
+      ],
+      "additionalProperties": false
+    },
+    "Receipt": {
+      "type": "object",
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "contract_version": {
+          "const": "tsetmc.v1"
+        },
+        "producer_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_epoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "batch_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "instrument_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ownership_generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "stream": {
+          "enum": [
+            "tsetmc_daily",
+            "tsetmc_current",
+            "tsetmc_coverage",
+            "tsetmc_status"
+          ]
+        },
+        "payload_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "destination_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "state": {
+          "const": "committed"
+        },
+        "server_ingested_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        },
+        "event_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReceiptRecord"
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "applied": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "recorded_no_change": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "superseded": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "duplicate": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          },
+          "required": [
+            "applied",
+            "recorded_no_change",
+            "superseded",
+            "duplicate"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "protocol_version",
+        "contract_version",
+        "producer_id",
+        "source_epoch",
+        "batch_id",
+        "instrument_id",
+        "ownership_generation",
+        "stream",
+        "payload_sha256",
+        "destination_id",
+        "state",
+        "server_ingested_at",
+        "event_cursor",
+        "records",
+        "counts"
+      ],
+      "additionalProperties": false
+    },
+    "ReconcileKey": {
+      "type": "object",
+      "properties": {
+        "stream": {
+          "enum": [
+            "tsetmc_daily",
+            "tsetmc_current",
+            "tsetmc_coverage",
+            "tsetmc_status"
+          ]
+        },
+        "trading_date": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "stream",
+        "trading_date"
+      ],
+      "additionalProperties": false
+    },
+    "ReconcileRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "protocol_version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "contract_version": {
+              "const": "tsetmc.v1"
+            },
+            "session_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "instrument_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ins_code": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,19}$"
+            },
+            "source_epoch": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ownership_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "mode": {
+              "const": "keys"
+            },
+            "keys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ReconcileKey"
+              },
+              "minItems": 1,
+              "maxItems": 100
+            }
+          },
+          "required": [
+            "protocol_version",
+            "contract_version",
+            "session_id",
+            "session_generation",
+            "instrument_id",
+            "ins_code",
+            "source_epoch",
+            "ownership_generation",
+            "mode",
+            "keys"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol_version": {
+              "const": 1,
+              "type": "integer"
+            },
+            "contract_version": {
+              "const": "tsetmc.v1"
+            },
+            "session_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "session_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "instrument_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ins_code": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,19}$"
+            },
+            "source_epoch": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "ownership_generation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "mode": {
+              "const": "daily_manifest"
+            },
+            "source_fence": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            },
+            "from_date": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "through_date": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "after_date": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "protocol_version",
+            "contract_version",
+            "session_id",
+            "session_generation",
+            "instrument_id",
+            "ins_code",
+            "source_epoch",
+            "ownership_generation",
+            "mode",
+            "source_fence",
+            "from_date",
+            "through_date",
+            "after_date",
+            "limit"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ReconcileRow": {
+      "type": "object",
+      "properties": {
+        "stream": {
+          "enum": [
+            "tsetmc_daily",
+            "tsetmc_current",
+            "tsetmc_coverage",
+            "tsetmc_status"
+          ]
+        },
+        "trading_date": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "source_position": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state_version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "financial_revision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "financial_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upstream_finality": {
+          "const": "unverified"
+        },
+        "local_finalization": {
+          "anyOf": [
+            {
+              "enum": [
+                "source_unverified",
+                "operator_finalized"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "revision_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "revision_complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "stream",
+        "trading_date",
+        "found",
+        "source_position",
+        "state_version",
+        "financial_revision",
+        "financial_hash",
+        "state_sha256",
+        "upstream_finality",
+        "local_finalization",
+        "revision_count",
+        "revision_sha256",
+        "revision_complete"
+      ],
+      "additionalProperties": false
+    },
+    "ReconcileResponse": {
+      "type": "object",
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "contract_version": {
+          "const": "tsetmc.v1"
+        },
+        "mode": {
+          "enum": [
+            "keys",
+            "daily_manifest"
+          ]
+        },
+        "instrument_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ins_code": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,19}$"
+        },
+        "source_epoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ownership_generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "destination_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "server_checked_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,6})?Z$"
+        },
+        "source_fence": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,18}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReconcileRow"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        },
+        "next_after_date": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "has_more": {
+          "type": "boolean"
+        },
+        "page_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "contract_version",
+        "mode",
+        "instrument_id",
+        "ins_code",
+        "source_epoch",
+        "ownership_generation",
+        "destination_id",
+        "server_checked_at",
+        "source_fence",
+        "rows",
+        "next_after_date",
+        "has_more",
+        "page_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "record_indexes": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 99
+              },
+              "minItems": 0,
+              "maxItems": 100
+            }
+          },
+          "required": [
+            "code",
+            "retryable",
+            "record_indexes"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Batch"
+    },
+    {
+      "$ref": "#/$defs/Receipt"
+    },
+    {
+      "$ref": "#/$defs/ReconcileRequest"
+    },
+    {
+      "$ref": "#/$defs/ReconcileResponse"
+    },
+    {
+      "$ref": "#/$defs/Error"
+    }
+  ]
+}

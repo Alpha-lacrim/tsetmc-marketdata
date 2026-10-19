@@ -1,0 +1,16 @@
+{
+  "after_date": null,
+  "contract_version": "tsetmc.v1",
+  "from_date": "2026-03-21",
+  "ins_code": "900000000000000001",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "limit": 100,
+  "mode": "daily_manifest",
+  "ownership_generation": 1,
+  "protocol_version": 1,
+  "session_generation": 1,
+  "session_id": "40000000-0000-4000-8000-000000000001",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "source_fence": "4",
+  "through_date": "2026-03-21"
+}

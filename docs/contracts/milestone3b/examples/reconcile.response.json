@@ -1,0 +1,32 @@
+{
+  "contract_version": "tsetmc.v1",
+  "destination_id": "30000000-0000-4000-8000-000000000001",
+  "has_more": false,
+  "ins_code": "900000000000000001",
+  "instrument_id": "5edeb86a-f2ce-56af-bbcb-f22786aa3ca5",
+  "mode": "daily_manifest",
+  "next_after_date": null,
+  "ownership_generation": 1,
+  "page_sha256": "57b2ebc3b8a65dfbaab6aa0a8e54b1b9ff0a5427b4fc3a6459400f978a67af91",
+  "protocol_version": 1,
+  "rows": [
+    {
+      "financial_hash": "79c7086d905b8bfbbe0b9f50d744afeef4f4d315128ceb9ba3688c04fed077fd",
+      "financial_revision": "2",
+      "found": true,
+      "local_finalization": "source_unverified",
+      "revision_complete": true,
+      "revision_count": 1,
+      "revision_sha256": "1aae7ee5248279143ca42767db4f5c22e44d07ab79e5fbac66718b6c74bd04da",
+      "source_position": "4",
+      "state_sha256": "97c0e7108ed6c833b57f0e9b116a590f6150ebbd3ad9bde024cffe9803a209d3",
+      "state_version": "4",
+      "stream": "tsetmc_daily",
+      "trading_date": "2026-03-21",
+      "upstream_finality": "unverified"
+    }
+  ],
+  "server_checked_at": "2026-03-22T09:00:03Z",
+  "source_epoch": "10000000-0000-4000-8000-000000000001",
+  "source_fence": "4"
+}
