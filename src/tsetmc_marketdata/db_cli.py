@@ -134,6 +134,7 @@ async def run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
                     kind="captured_replay" if args.capture_dir else "live_http",
                     active=not bool(args.capture_dir),
                     expected_instrument_id=configured.instrument_id,
+                    metadata_ttl=900 if args.command == "poll-current" else 0,
                 )
                 dates = None
                 if args.command == "reconcile-history":

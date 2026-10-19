@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 
 from tsetmc_marketdata.models.daily import DailyRecord
 from tsetmc_marketdata.storage import schema_v1 as t
+from tsetmc_marketdata.storage import schema_v3a as s
 from tsetmc_marketdata.storage.database import fence
 from tsetmc_marketdata.storage.serialization import daily_from_row, json_safe
 
@@ -137,9 +138,14 @@ async def retain(
             (t.quarantine, ["observation_id", "last_observation_id", "resolution_observation_id"]),
             (t.decisions, ["candidate_observation_id", "previous_observation_id"]),
             (t.coverage, ["observation_id"]),
+            (s.reviews, ["first_observation_id", "second_observation_id"]),
         )
         for column in columns
     ]
+    identity_reference = sa.cast(
+        t.observations.c.request_parameters["identity_observation_id"].astext, sa.BigInteger
+    )
+    references.append(sa.select(identity_reference).where(identity_reference.is_not(None)))
     body_candidate = sa.and_(
         t.observations.c.ins_code == ins_code,
         t.observations.c.received_at < now - timedelta(days=90),

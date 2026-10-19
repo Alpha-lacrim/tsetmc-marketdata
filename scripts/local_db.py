@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 import secrets
@@ -120,7 +121,7 @@ def backup(path: Path) -> None:
     print(json.dumps({"backup": path.relative_to(ROOT).as_posix(), "bytes": path.stat().st_size}))
 
 
-async def restore_check(path: Path) -> dict[str, Any]:
+async def restore_check(path: Path, expected_revision: str | None = None) -> dict[str, Any]:
     # Restore into a newly generated test DB only, never over the collector's persistent DB.
     name = "tsetmc_test_" + uuid4().hex
     settings = DatabaseSettings(private_settings()["owner"])
@@ -148,8 +149,17 @@ async def restore_check(path: Path) -> dict[str, Any]:
         url = settings.validated_url().set(database=name).render_as_string(hide_password=False)
         db = Database(DatabaseSettings(url))
         try:
-            async with db.read() as conn:
-                result = await verify_schema(conn)
+            async with db.engine.connect() as conn:
+                await conn.execute(sa.text("SET TRANSACTION READ ONLY"))
+                if expected_revision is None:
+                    result = await verify_schema(conn)
+                else:
+                    if expected_revision not in {"0002_instrument_links", "0003_scheduling"}:
+                        raise ValueError("unsupported historical backup schema")
+                    revision = await conn.scalar(sa.text("SELECT version_num FROM alembic_version"))
+                    if revision != expected_revision:
+                        raise ValueError("restored schema differs from expected backup schema")
+                    result = {"database": name, "schema_revision": revision}
                 result["daily_records"] = await conn.scalar(
                     sa.text("SELECT count(*) FROM daily_records")
                 )
@@ -159,6 +169,30 @@ async def restore_check(path: Path) -> dict[str, Any]:
                 result["source_observations"] = await conn.scalar(
                     sa.text("SELECT count(*) FROM source_observations")
                 )
+                rows = (
+                    await conn.execute(
+                        sa.text(
+                            "SELECT ins_code,trading_date,financial_hash,revision,"
+                            "finalization_state "
+                            "FROM daily_records ORDER BY ins_code,trading_date"
+                        )
+                    )
+                ).all()
+                result["daily_state_sha256"] = hashlib.sha256(
+                    "\n".join(map(str, rows)).encode()
+                ).hexdigest()
+                bodies = await conn.stream(
+                    sa.text(
+                        "SELECT raw_body,raw_sha256 FROM source_observations "
+                        "WHERE raw_body IS NOT NULL"
+                    )
+                )
+                checked = 0
+                async for body, digest in bodies:
+                    if hashlib.sha256(body).hexdigest() != digest:
+                        raise ValueError("restored raw evidence hash differs")
+                    checked += 1
+                result["raw_hashes_verified"] = checked
                 return result
         finally:
             await db.aclose()
@@ -180,7 +214,9 @@ def main() -> int:
         commands.add_parser(name).add_argument("arguments", nargs=argparse.REMAINDER)
     backup_parser = commands.add_parser("backup")
     backup_parser.add_argument("--output", type=Path)
-    commands.add_parser("restore-check").add_argument("input", type=Path)
+    restore_parser = commands.add_parser("restore-check")
+    restore_parser.add_argument("input", type=Path)
+    restore_parser.add_argument("--expected-revision")
     args = parser.parse_args()
     try:
         if args.command == "init":
@@ -207,7 +243,11 @@ def main() -> int:
             backup(args.output or ROOT / f".local/backups/{stamp}.dump")
             return 0
         if args.command == "restore-check":
-            print(json.dumps(asyncio.run(restore_check(args.input)), sort_keys=True))
+            print(
+                json.dumps(
+                    asyncio.run(restore_check(args.input, args.expected_revision)), sort_keys=True
+                )
+            )
             return 0
         values = private_settings()
         env = dict(os.environ)

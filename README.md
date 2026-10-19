@@ -1,4 +1,4 @@
-# TSETMC Market Data — Milestone 2
+# TSETMC Market Data — Milestone 3A
 
 Independent Python foundation for a TSETMC HTTP/JSON collector and the Go
 `ChartData` daily chart contract. Authorized pilot: **فولاد — فولاد مبارکه اصفهان**,
@@ -9,10 +9,12 @@ historical import/corrections/reconciliation, current snapshots/latest state,
 recovery and database-backed ChartData export. TradingView projects and runtime
 resources remain completely independent.
 Repository: [Alpha-lacrim/tsetmc-marketdata](https://github.com/Alpha-lacrim/tsetmc-marketdata).
+Milestone 3A adds a disabled-by-default foreground scheduler, durable bounded
+catch-up, session expectations, health reporting and auditable daily confirmation.
 This is a development implementation, with no production-readiness claim. Polling
-is opt-in and limited to an explicit manual window; no unattended service is enabled.
-Automated historical scheduling, durable remote synchronization, company FastAPI
-integration and production deployment are not implemented. Only فولاد is live;
+and scheduled maintenance require an explicit bounded operator window; no
+unattended service is installed or enabled. Durable remote synchronization, company
+FastAPI integration and production deployment are not implemented. Only فولاد is live;
 schema keys, ownership and reusable collectors already support multiple instruments.
 
 ## Setup
@@ -70,6 +72,8 @@ access to these files and keep them with your private backups. The helper suppli
 credentials to child environments without printing them. The database is published
 only on loopback. Startup and migrations are separate; collectors never migrate.
 An existing local installation should start at `db-status`, not rerun `init`.
+M3A requires head `0003_scheduling`. Before upgrading M2, back up and restore-check
+the existing database as described in [automatic collection](docs/automatic-collector.md).
 
 ```powershell
 uv run python scripts/local_db.py run -- backfill-history
@@ -93,7 +97,9 @@ owner, so writes and polling never overlap for that instrument.
 records and currently returns eight empty arrays, with excluded counts in the
 report. Use `--selection accepted-unverified` deliberately for accepted source
 observations. Reconciliation does not establish candle finality. No automatic
-finalization or manual finalization command is implemented.
+finalization is performed. M3A's single-date `review-daily` command can record
+reversible operator confirmation only after evidence checks; it has not been used
+to finalize any live pilot record. Read the [policy](docs/daily-finalization-policy.md).
 
 Live Milestone 2 verification on 2026-10-19 stored **4,662 accepted dates**,
 2007-03-11 through 2026-10-18, and one current snapshot. A repeated full audit found
@@ -108,6 +114,37 @@ window, not a guessed exchange calendar; no full market-session qualification is
 claimed. See [operations](docs/collector-operations.md), [schema](docs/database-schema.md),
 [current-price policy](docs/current-price-collection.md), and
 [backup/recovery](docs/recovery-and-backup.md).
+
+## Explicit scheduled collection
+
+Copy `config/collector.example.json` to ignored `.local/collector.json`, set a
+current aware operating window (at most one day), explicit job/request budgets,
+eligibility and provenance, then set enabled=true. The example is disabled and
+its illustrative dates are not an exchange calendar. Session status defaults to
+UNKNOWN. Without qualified evidence, jobs defer unless their operator window is
+explicitly approved. Current intervals are at least 30 seconds; jobs run serially
+under the existing instrument advisory owner. Ctrl+C releases ownership.
+
+```powershell
+uv run python -m tsetmc_marketdata.cli validate-collector-config --config .local/collector.json
+uv run python scripts/local_db.py run -- run-collector --config .local/collector.json --activate
+uv run python scripts/local_db.py run -- collector-health
+uv run python scripts/local_db.py run -- inspect-collection-evidence --kind quarantine
+```
+
+These commands also work on Linux. Restart reuses durable slots/run identities
+and coalesces overdue work; it does not replay every missed interval. Full audits
+defer while current collection is eligible. Cache expiry still re-verifies identity.
+No calendar dates are invented and source flags/repeats never finalize records.
+
+The bounded M3A experiment made eight successful requests over about one minute.
+Three current observations repeated the same state; the current day was available
+through a dated endpoint but absent from the two recent lists. All 4,662 stored
+daily states remained unchanged. This did **not** qualify an active/full session.
+Exact captures and measurements remain private. See [source behavior](docs/tsetmc-source-behavior.md),
+[operations](docs/automatic-collector.md), [session policy](docs/market-session-policy.md),
+[observability and capacity estimates](docs/collector-observability.md),
+[design](docs/milestone-3a-design.md) and [verification](docs/milestone-3a-verification.md).
 
 ## Offline verification
 

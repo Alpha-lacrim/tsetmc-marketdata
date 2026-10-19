@@ -1,5 +1,9 @@
 # TSETMC API qualification — 2026-10-19
 
+For M3A's bounded current/list/dated experiment and its remaining uncertainties,
+see [source behavior](tsetmc-source-behavior.md). Exact live evidence stays private;
+no new finality or session-calendar guarantee was established.
+
 The observations in the original sections below are the Milestone 1 capture set.
 A later Milestone 2 live retrieval on the same date returned **4,662 accepted
 dates**, including July 29 opening=2956, which agrees with the dated endpoint.

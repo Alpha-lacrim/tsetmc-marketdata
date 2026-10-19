@@ -1,5 +1,9 @@
 # Milestone 1 architecture
 
+Milestone 3A extends the M2 collector through [durable scheduling](milestone-3a-design.md),
+without replacing the source/parsing/presentation boundary below. No company
+integration or synchronization has been added.
+
 Milestone 2 adds independent local PostgreSQL storage and collectors. See
 [current design](milestone-2-design.md), [schema](database-schema.md), and
 [operations](collector-operations.md). The exclusions below describe the original

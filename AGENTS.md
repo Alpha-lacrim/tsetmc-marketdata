@@ -2,14 +2,19 @@
 
 Keep all work in this independent repository. Never modify TradingView projects,
 connect to their databases, use their volumes, or reuse their runtime configuration.
-Milestone 2 authorizes independent PostgreSQL 16.1 storage, Alembic migrations,
-one-shot collectors and explicitly activated, bounded manual polling here only.
+Milestone 3A authorizes independent PostgreSQL 16.1 storage, additive migrations,
+and explicitly activated, bounded foreground scheduling here only. No installed
+service, auto-start policy or unattended deployment is authorized. Session inference
+must remain UNKNOWN without qualified evidence; explicit operator windows require
+provenance. Preserve source uncertainty and the default finalized export selection.
 Only insCode `46348559193224090` (فولاد) may be enabled or fetched live. Reusable
 storage and collection code must scope ownership, keys and provenance by instrument;
 use invented identities for isolation tests. Do not implement synchronization,
 company FastAPI integration, deployment or additional live instruments.
 Do not commit, push, tag, or release without additional explicit authorization.
 Preserve commit 87690cb1f03f2b3deecb122c58eb48c06dff4e06 and v0.1.0-milestone1.
+Preserve published Milestone 2 commit 01a827be39bb48864d0b76c8e952f176a4904556.
+Do not edit applied migration files or frozen schema metadata; add a new revision.
 
 Use Python 3.12+, async httpx, Decimal source measurements, aware instants, and
 Gregorian trading dates. Preserve raw payloads. Never conflate pDrCotVal and pClosing,

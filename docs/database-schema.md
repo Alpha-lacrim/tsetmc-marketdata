@@ -1,7 +1,7 @@
 # PostgreSQL schema
 
 Target PostgreSQL 16.1, SQLAlchemy 2.x + asyncpg, Alembic head
-`0002_instrument_links` (after `0001_tsetmc`). Migrations never seed an instrument.
+`0003_scheduling` (after `0001_tsetmc` and `0002_instrument_links`). Migrations never seed an instrument.
 Runtime schema verification rejects absent/incompatible revisions. New schema
 changes require an additive migration; do not edit an applied migration.
 
@@ -18,6 +18,15 @@ changes require an additive migration; do not edit an applied migration.
 | reconciliation_decisions | BIGINT identity decision_id; run/instrument/date; candidate/previous observations; accepted, reason, decided_at |
 | collection_status | PK(ins_code,job); composite FK(last_run_id,ins_code,job); last_attempt/success, failure category/count, retry_after |
 | data_coverage | PK(ins_code,trading_date); state, observation FK, checked_at |
+| scheduled_jobs | PK(ins_code,schedule_key); spec hash, next_due, active slot/run UUID and parameters, completed slot, failure/backoff and coalescing counts |
+| collector_runtime | ins_code PK/FK; service UUID, actual owner PID/backend start, state/heartbeat, session expectation/provenance/expiry, operation and last financial change |
+| daily_reviews | UUID PK; composite FK(ins_code,trading_date), financial hash, confirm/revoke, actor/reason, session evidence, grace and two instrument-linked observation FKs |
+
+These three additive M3A tables bring the application total to 14. They do not
+alter existing measurements or bulk finalization. Applied migration files and
+frozen schema metadata are immutable. See [M3A design](milestone-3a-design.md)
+for rationale and [confirmation policy](daily-finalization-policy.md) for checks.
+Downgrade/interrupted migration tests run only in disposable databases.
 
 The nine measurements are `previous_close`, `opening_price`, `last_traded_price`,
 `high`, `low`, `official_close`, `trade_count`, `traded_volume`, `traded_value`.

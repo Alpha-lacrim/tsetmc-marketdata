@@ -1,7 +1,10 @@
-# Public baseline file inventory
+# Milestone 3A project file inventory
 
-54 publishable files. Genuine captures and derived evidence, audit backups,
-Git metadata, environments, caches and build output are excluded.
+111 project files, including the preserved Milestone 1/2 foundation.
+This inventory covers the reviewed public project baseline.
+Genuine captures, backups, credentials, Git metadata, environments, caches and
+build outputs are excluded. Local conversation and handoff notes are preserved
+privately outside this inventory.
 
 - `.env.example`
 - `.gitattributes`
@@ -9,28 +12,62 @@ Git metadata, environments, caches and build output are excluded.
 - `.gitignore`
 - `.python-version`
 - `AGENTS.md`
+- `alembic.ini`
 - `CODEX.md`
-- `README.md`
+- `compose.tsetmc.yaml`
+- `config/collector.example.json`
+- `config/instruments.example.json`
+- `docker/init-collector.sh`
 - `docs/api-research.md`
 - `docs/architecture.md`
+- `docs/automatic-collector.md`
+- `docs/collector-observability.md`
+- `docs/collector-operations.md`
+- `docs/current-price-collection.md`
+- `docs/daily-finalization-policy.md`
+- `docs/database-schema.md`
 - `docs/field-mapping.md`
 - `docs/file-inventory.md`
 - `docs/frontend-contract.md`
+- `docs/market-session-policy.md`
 - `docs/milestone-1-report.md`
+- `docs/milestone-2-design.md`
+- `docs/milestone-2-verification.md`
+- `docs/milestone-3a-design.md`
+- `docs/milestone-3a-verification.md`
 - `docs/next-milestones.md`
 - `docs/pilot-verification.md`
 - `docs/publication-audit.md`
 - `docs/publication-verification.md`
+- `docs/reconciliation.md`
+- `docs/recovery-and-backup.md`
+- `docs/tsetmc-source-behavior.md`
 - `examples/README.md`
 - `examples/synthetic-chartdata-legacy.json`
 - `examples/synthetic-chartdata.json`
+- `migrations/env.py`
+- `migrations/versions/0001_tsetmc.py`
+- `migrations/versions/0002_instrument_links.py`
+- `migrations/versions/0003_scheduling.py`
 - `pyproject.toml`
+- `README.md`
+- `scripts/local_db.py`
 - `scripts/qualify_source.py`
 - `src/tsetmc_marketdata/__init__.py`
 - `src/tsetmc_marketdata/adapters/__init__.py`
 - `src/tsetmc_marketdata/adapters/chartdata.py`
 - `src/tsetmc_marketdata/cli.py`
+- `src/tsetmc_marketdata/collection/__init__.py`
+- `src/tsetmc_marketdata/collection/budget.py`
+- `src/tsetmc_marketdata/collection/instruments.py`
+- `src/tsetmc_marketdata/collection/jobs.py`
+- `src/tsetmc_marketdata/collection/scheduler.py`
+- `src/tsetmc_marketdata/collection/service.py`
+- `src/tsetmc_marketdata/collection/service_config.py`
+- `src/tsetmc_marketdata/collection/sessions.py`
+- `src/tsetmc_marketdata/collection/source.py`
 - `src/tsetmc_marketdata/config.py`
+- `src/tsetmc_marketdata/db_cli.py`
 - `src/tsetmc_marketdata/errors.py`
 - `src/tsetmc_marketdata/jsonio.py`
 - `src/tsetmc_marketdata/models/__init__.py`
@@ -42,6 +79,19 @@ Git metadata, environments, caches and build output are excluded.
 - `src/tsetmc_marketdata/providers/closing_prices.py`
 - `src/tsetmc_marketdata/providers/http_client.py`
 - `src/tsetmc_marketdata/providers/instruments.py`
+- `src/tsetmc_marketdata/service_cli.py`
+- `src/tsetmc_marketdata/storage/__init__.py`
+- `src/tsetmc_marketdata/storage/config.py`
+- `src/tsetmc_marketdata/storage/database.py`
+- `src/tsetmc_marketdata/storage/health.py`
+- `src/tsetmc_marketdata/storage/ordering.py`
+- `src/tsetmc_marketdata/storage/queries.py`
+- `src/tsetmc_marketdata/storage/repository.py`
+- `src/tsetmc_marketdata/storage/reviews.py`
+- `src/tsetmc_marketdata/storage/scheduling.py`
+- `src/tsetmc_marketdata/storage/schema_v1.py`
+- `src/tsetmc_marketdata/storage/schema_v3a.py`
+- `src/tsetmc_marketdata/storage/serialization.py`
 - `src/tsetmc_marketdata/utils/__init__.py`
 - `src/tsetmc_marketdata/utils/dates.py`
 - `tests/conftest.py`
@@ -50,10 +100,20 @@ Git metadata, environments, caches and build output are excluded.
 - `tests/fixtures/synthetic-daily.json`
 - `tests/fixtures/synthetic-history.json`
 - `tests/fixtures/synthetic-instrument.json`
+- `tests/integration/__init__.py`
+- `tests/integration/conftest.py`
+- `tests/integration/helpers.py`
+- `tests/integration/test_automatic_collector.py`
+- `tests/integration/test_daily_reviews.py`
+- `tests/integration/test_migration_3a.py`
+- `tests/integration/test_persistence.py`
+- `tests/integration/test_reconciliation_conflicts.py`
 - `tests/live/test_pilot.py`
 - `tests/unit/test_captured_pilot.py`
 - `tests/unit/test_cli.py`
 - `tests/unit/test_dates_chartdata.py`
 - `tests/unit/test_http.py`
 - `tests/unit/test_parsing.py`
+- `tests/unit/test_service_policy.py`
+- `tests/unit/test_storage.py`
 - `uv.lock`

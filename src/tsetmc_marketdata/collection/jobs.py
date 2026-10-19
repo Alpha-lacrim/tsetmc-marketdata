@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 
 import sqlalchemy as sa
 
+from tsetmc_marketdata.collection.scheduler import Clock, SystemClock
 from tsetmc_marketdata.collection.source import Source
 from tsetmc_marketdata.errors import RecordError, SourceDataError, TSETMCError
 from tsetmc_marketdata.models.daily import DailyRecord
@@ -30,9 +31,16 @@ class Collector:
         kind: str = "live_http",
         active: bool = False,
         expected_instrument_id: str | None = None,
+        metadata_ttl: float = 0,
+        clock: Clock | None = None,
     ) -> None:
         self.repository, self.source, self.kind, self.active = repository, source, kind, active
         self.expected_instrument_id = expected_instrument_id
+        if not 0 <= metadata_ttl <= 86400:
+            raise ValueError("invalid metadata cache lifetime")
+        self.metadata_ttl, self.clock = metadata_ttl, clock or SystemClock()
+        self._metadata_cache: JSONResponse | None = None
+        self._cache_at: float | None = None
 
     async def run(
         self,
@@ -56,6 +64,8 @@ class Collector:
             "expected_instrument_id": self.expected_instrument_id,
             "activate": self.active,
         }
+        if self.repository.run_context:
+            spec["schedule_context"] = self.repository.run_context
         if not dry_run:
             cached = await self.repository.begin_run(run_id, job, spec)
             if cached is not None:
@@ -63,14 +73,29 @@ class Collector:
         responses: list[JSONResponse] = []
         path = f"Instrument/GetInstrumentInfo/{ins_code}"
         try:
-            metadata = await self.source.get_json(path)
-            responses.append(metadata)
+            now = self.clock.monotonic()
+            cached_metadata = (
+                self._metadata_cache is not None
+                and self._cache_at is not None
+                and 0 <= now - self._cache_at < self.metadata_ttl
+                and self.clock.now() >= self._metadata_cache.received_at
+                and (self.clock.now() - self._metadata_cache.received_at).total_seconds()
+                < self.metadata_ttl
+            )
+            metadata = self._metadata_cache if cached_metadata else await self.source.get_json(path)
+            assert metadata is not None
+            if not cached_metadata:
+                responses.append(metadata)
             instrument = parse_instrument(metadata.payload, ins_code)
             if (
                 self.expected_instrument_id is not None
                 and instrument.instrument_id != self.expected_instrument_id
             ):
                 raise RecordError("metadata instrument ID does not match configuration")
+            self._metadata_cache, self._cache_at = (
+                metadata,
+                now if not cached_metadata else self._cache_at,
+            )
             if job in {"backfill-history", "refresh-history", "audit-history"}:
                 path = f"ClosingPrice/GetClosingPriceDailyList/{ins_code}/{source_limit}"
                 response = await self.source.get_json(path)
@@ -143,6 +168,8 @@ class Collector:
                 )
             raise ValueError("unsupported collection job")
         except BaseException as exc:
+            if isinstance(exc, SourceDataError):
+                self._metadata_cache, self._cache_at = None, None
             if not dry_run:
                 category = (
                     exc.kind.value

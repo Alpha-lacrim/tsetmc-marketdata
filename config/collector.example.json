@@ -1,0 +1,19 @@
+{
+  "enabled": false,
+  "ins_code": "46348559193224090",
+  "expected_instrument_id": "IRO1FOLD0001",
+  "start": "2030-01-01T09:00:00+03:30",
+  "end": "2030-01-01T09:10:00+03:30",
+  "request_budget": 8,
+  "max_jobs": 8,
+  "metadata_ttl": 900,
+  "job_timeout": 60,
+  "http": {"max_retries": 0, "total_timeout": 25, "pacing_seconds": 1},
+  "sessions": [],
+  "jobs": [
+    {"key": "current-example", "job": "observe-current", "first_due": "2030-01-01T09:00:00+03:30", "interval": 30, "eligibility": "OPERATOR_WINDOW", "provenance": "Replace with an explicit approved observation window; this is not a market calendar"},
+    {"key": "recent-example", "job": "refresh-history", "first_due": "2030-01-01T09:00:00+03:30", "interval": 86400, "source_limit": 20, "eligibility": "NOT_EXPECTED", "provenance": "Eligible only with dated closure/session-completion evidence"},
+    {"key": "reconcile-example", "job": "reconcile-history", "first_due": "2030-01-01T09:00:00+03:30", "interval": 3600, "eligibility": "NOT_EXPECTED", "provenance": "Bounded pending-quarantine review"},
+    {"key": "audit-example", "job": "audit-history", "first_due": "2030-01-01T09:00:00+03:30", "interval": 604800, "eligibility": "NOT_EXPECTED", "provenance": "Weekly outside-active-window audit, conditional on evidence"}
+  ]
+}

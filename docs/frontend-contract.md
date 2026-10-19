@@ -1,5 +1,10 @@
 # Exact company Go contract
 
+M3A preserves this adapter and both selection modes. Its explicit single-date
+[operator confirmation](daily-finalization-policy.md) can make a reviewed hash
+eligible for finalized selection; the scheduler never confirms automatically.
+No live pilot records were finalized during M3A.
+
 Milestone 2 uses this unchanged adapter for stored records via
 `export-db-chartdata`. The default selects explicitly finalized records only;
 source finality remains unverified, so use `--selection accepted-unverified`

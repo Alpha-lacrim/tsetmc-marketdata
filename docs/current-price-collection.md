@@ -1,5 +1,10 @@
 # Current-price collection and ordering
 
+M3A reuses these ordering rules in the [foreground service](automatic-collector.md),
+with expiring verified identity caching and durable schedule slots. See
+[freshness versus availability](collector-observability.md) and the bounded
+[source observations](tsetmc-source-behavior.md). No new receipt implies a trade.
+
 `observe-current` is one-shot. It stores an actual HTTP observation and parsed
 snapshot, then updates an instrument-specific latest pointer in the same transaction.
 `pDrCotVal` remains last traded price; `pClosing` remains official/current closing
@@ -62,7 +67,8 @@ ownership. Keep all snapshots seven days; keep accepted state changes 90 days;
 always protect the current latest pointer. After pruning eligible snapshots, exact
 raw bodies older than 90 days can be removed only when no canonical record,
 revision, metadata pointer, remaining snapshot, quarantine, decision or coverage
-references them. Their hash, receipt, request and audit metadata remain, with a
+references them, including M3A's cached identity and operator-review evidence.
+Their hash, receipt, request and audit metadata remain, with a
 body-pruned timestamp. Canonical daily data, corrections and unresolved/resolved
 quarantine evidence are protected. No retention schedule runs automatically.
 

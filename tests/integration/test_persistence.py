@@ -18,7 +18,13 @@ from tsetmc_marketdata.collection.jobs import Collector
 from tsetmc_marketdata.errors import ErrorKind, RecordError, TransportError
 from tsetmc_marketdata.storage import schema_v1 as t
 from tsetmc_marketdata.storage.config import DatabaseSettings, OwnershipError, SchemaError
-from tsetmc_marketdata.storage.database import Database, fence, make_engine, verify_schema
+from tsetmc_marketdata.storage.database import (
+    SCHEMA_REVISION,
+    Database,
+    fence,
+    make_engine,
+    verify_schema,
+)
 from tsetmc_marketdata.storage.queries import collection_report, pending_dates, read_daily, retain
 from tsetmc_marketdata.storage.repository import Repository
 
@@ -47,7 +53,7 @@ async def test_fresh_migration_rollback_and_missing_schema(pg_database):
     async with db.read() as conn:
         result = await verify_schema(conn)
         assert result["server_version"].startswith("16.")
-        assert result["schema_revision"] == "0002_instrument_links"
+        assert result["schema_revision"] == SCHEMA_REVISION
         assert await conn.scalar(sa.select(sa.func.count()).select_from(t.instruments)) == 0
     await migration(db.engine, "downgrade", "base")
     with pytest.raises(SchemaError, match="absent|incompatible"):

@@ -1,6 +1,7 @@
 """Explicit bounded manual operating windows; no inferred exchange holiday calendar."""
 
 import asyncio
+import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -12,9 +13,13 @@ from tsetmc_marketdata.errors import ErrorKind, TSETMCError
 class Clock(Protocol):
     def now(self) -> datetime: ...
     async def sleep(self, seconds: float) -> None: ...
+    def monotonic(self) -> float: ...
 
 
 class SystemClock:
+    def monotonic(self) -> float:
+        return time.monotonic()
+
     def now(self) -> datetime:
         return datetime.now(UTC)
 

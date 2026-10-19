@@ -14,7 +14,7 @@ from typing import Any
 
 import sqlalchemy as sa
 
-from tsetmc_marketdata import db_cli
+from tsetmc_marketdata import db_cli, service_cli
 from tsetmc_marketdata.adapters.chartdata import to_chartdata
 from tsetmc_marketdata.config import PILOT_INS_CODE, Settings, require_pilot
 from tsetmc_marketdata.errors import ErrorKind, SourceDataError, TSETMCError
@@ -102,6 +102,7 @@ def _parser() -> argparse.ArgumentParser:
                 "--kind", choices=("history", "current", "instrument"), default="history"
             )
     db_cli.configure(sub)
+    service_cli.configure(sub)
     return parser
 
 
@@ -166,6 +167,8 @@ async def _payload(args: argparse.Namespace) -> tuple[dict[str, Any], datetime |
 
 
 async def run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+    if args.command in service_cli.COMMANDS:
+        return await service_cli.run(args)
     if args.command in db_cli.COMMANDS:
         return await db_cli.run(args)
     require_pilot(args.ins_code)
@@ -243,7 +246,13 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError as exc:
         result, code = {"error": "invalid_input", "message": str(exc)}, 1
     except OSError as exc:
-        result, code = {"error": "invalid_input_or_io", "message": type(exc).__name__}, 1
+        database_command = args.command in db_cli.COMMANDS | service_cli.COMMANDS
+        category = (
+            "postgres_unavailable"
+            if database_command and isinstance(exc, (ConnectionError, TimeoutError))
+            else "invalid_input_or_io"
+        )
+        result, code = {"error": category, "message": type(exc).__name__}, 1
     except KeyboardInterrupt:
         result, code = {"error": "cancelled"}, 130
     result["reported_at"] = datetime.now(UTC)

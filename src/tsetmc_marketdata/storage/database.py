@@ -12,9 +12,10 @@ from sqlalchemy.pool import NullPool
 from tsetmc_marketdata.config import validate_ins_code
 from tsetmc_marketdata.storage.config import DatabaseSettings, OwnershipError, SchemaError
 from tsetmc_marketdata.storage.schema_v1 import instruments, metadata
+from tsetmc_marketdata.storage.schema_v3a import metadata as scheduling_metadata
 
 LOCK_NAMESPACE = 81483
-SCHEMA_REVISION = "0002_instrument_links"
+SCHEMA_REVISION = "0003_scheduling"
 
 
 def make_engine(settings: DatabaseSettings) -> AsyncEngine:
@@ -51,7 +52,7 @@ async def verify_schema(conn: AsyncConnection) -> dict[str, Any]:
             await conn.execute(sa.text("SELECT tablename FROM pg_tables WHERE schemaname='public'"))
         ).scalars()
     )
-    if not set(metadata.tables) <= existing:
+    if not (set(metadata.tables) | set(scheduling_metadata.tables)) <= existing:
         raise SchemaError("TSETMC schema is incomplete")
     return {"database": database, "server_version": version, "schema_revision": SCHEMA_REVISION}
 

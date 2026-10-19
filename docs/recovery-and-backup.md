@@ -1,5 +1,10 @@
 # Recovery and backup
 
+M3A head is `0003_scheduling`. For an existing M2 backup, restore-check with
+`--expected-revision 0002_instrument_links` before upgrading. Default restore-check
+expects current head. [M3A operation](automatic-collector.md) covers durable slot
+recovery and the bounded foreground lifecycle. Never downgrade the persistent pilot.
+
 The persistent TSETMC Compose volume is retained. Never use `down -v`, global Docker
 prune, or a database reset to recover a collector. No unrelated resource belongs
 to this project. Owner and collector credentials are separate and must be backed

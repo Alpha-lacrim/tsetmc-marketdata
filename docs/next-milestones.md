@@ -1,4 +1,4 @@
-# After Milestone 2
+# After Milestone 3A
 
 Milestone 2 implements the independent PostgreSQL collector described in
 [design](milestone-2-design.md), [schema](database-schema.md),
@@ -7,7 +7,17 @@ Its evidence, corrections, quarantine, latest state and restart protocol are loc
 only. No company integration or remote synchronization is implemented. The original
 Milestone 2 proposal remains preserved in the immutable Milestone 1 tag.
 
-## Proposed Milestone 3: durable outbound synchronization
+Milestone 3A adds bounded foreground scheduling, conservative session evidence,
+durable catch-up, health and auditable operator confirmation. Read its
+[design](milestone-3a-design.md), [verification](milestone-3a-verification.md) and
+[source qualification](tsetmc-source-behavior.md).
+
+## Proposed Milestone 3B: synchronization contract design
+
+We can design the company boundary now, provided source uncertainty is explicit
+in the contract. Full-session qualification remains necessary before unattended
+market collection; it need not block a design-only discussion. None of the
+following synchronization components is implemented in M3A.
 
 Keep the future boundary additive and provider-specific:
 
@@ -22,6 +32,8 @@ of TradingView minute-candle assumptions. Preserve separate last-trade and offic
 close fields, source/receipt instants, finality uncertainty and financial precision.
 Use decimal strings or an explicitly specified exact numeric wire representation
 for ingest; retain numeric float64 only at the ChartData presentation boundary.
+Carry source-unverified versus locally confirmed finalization, its policy/evidence
+and revocation. Operator confirmation is not an upstream guarantee.
 
 Proposed local tables in a **later migration**, not implemented now:
 
@@ -40,7 +52,7 @@ backoff, idempotent server acceptance, revision-aware conflict rules and replaya
 acknowledgments. A stable event ID must survive timeout after remote commit.
 
 Test duplicate/reordered deliveries, lost acknowledgments, remote downtime, crashes
-before/after acknowledgment, historical revisions, ambiguous source corrections,
+before/after acknowledgment, historical revisions, confirmation/revocation, ambiguous source corrections,
 multi-instrument isolation using invented identities, and backward compatibility
 of existing TradingView behavior. Agree data redistribution/access permissions
 before exposing raw evidence outside the independent collector.
@@ -55,5 +67,7 @@ the host, alerts and disk capacity. Confirm performance and request budgets befo
 enabling another real instrument. The schema supports multiple instruments, but
 only فولاد has live authorization or qualification.
 
-Milestone 3 requires its own authorization. Do not implement synchronization,
-company FastAPI changes, deployment, new instruments or publication as part of M2.
+Milestone 3B implementation requires its own authorization. Do not implement
+synchronization, company FastAPI changes, deployment, new instruments or Git
+publication as part of M3A. Separately approve a full-session source experiment
+with declared dates, session evidence, request budget and post-session rechecks.

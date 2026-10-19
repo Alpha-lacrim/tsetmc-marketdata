@@ -13,3 +13,11 @@ Milestone 2 implementation directly to main. No new tag or release is authorized
 Read docs/milestone-2-design.md, docs/database-schema.md and
 docs/collector-operations.md. No company integration or deployment is authorized. Instrument scoping
 is mandatory from the start; only فولاد may be used for live qualification.
+
+Milestone 3A now authorizes source-behavior qualification, conservative session
+expectations, durable operator-controlled scheduling, health and auditable daily
+reviews. Read docs/milestone-3a-design.md and docs/automatic-collector.md. The owner
+subsequently authorized committing and pushing the reviewed Milestone 3A changes
+directly to main. This publication authorization does not include a tag or release.
+Do not start company integration or remote synchronization, activate unattended
+collection, or expand live instruments.

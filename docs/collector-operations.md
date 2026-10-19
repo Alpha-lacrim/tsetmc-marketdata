@@ -1,5 +1,10 @@
 # Local collector operations
 
+M3A adds [explicit foreground scheduling](automatic-collector.md),
+[session policy](market-session-policy.md), [health](collector-observability.md)
+and [single-date operator confirmation](daily-finalization-policy.md). The
+one-shot/manual operations below remain available. No unattended service is enabled.
+
 Run from the checkout root after `uv sync --locked`. Python 3.12 and Docker Desktop
 on Windows, or Docker Engine/Compose on Linux, are supported. Follow README's
 resource/port inspection and separate init/start/migrate commands first. Never

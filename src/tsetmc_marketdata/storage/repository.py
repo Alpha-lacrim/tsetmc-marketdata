@@ -55,6 +55,8 @@ class Repository:
         self, conn: AsyncConnection, ins_code: str, *, fault: Callable[[str], None] | None = None
     ) -> None:
         self.conn, self.ins_code, self.fault = conn, validate_ins_code(ins_code), fault
+        self.identity_evidence_id: int | None = None
+        self.run_context: dict[str, Any] = {}
 
     @asynccontextmanager
     async def atomic(self, *, ingest: bool = False) -> AsyncIterator[None]:
@@ -99,6 +101,23 @@ class Repository:
                 summary={},
                 checkpoint={"phase": "started"},
             )
+            if self.run_context:
+                checkpoint = prior["checkpoint"] if prior else {}
+                history = checkpoint.get("attempt_history", [])
+                if prior:
+                    history = [
+                        *history,
+                        {
+                            "status": prior["status"],
+                            "failure_category": prior["failure_category"],
+                            "started_at": json_safe(prior["started_at"]),
+                            "ended_at": json_safe(prior["ended_at"]),
+                        },
+                    ]
+                values["checkpoint"].update(
+                    attempt_count=checkpoint.get("attempt_count", 0) + 1,
+                    attempt_history=history[-20:],
+                )
             await self.conn.execute(
                 insert(t.runs)
                 .values(**values)
@@ -136,6 +155,7 @@ class Repository:
                 request_parameters={
                     "path": response.path,
                     "attempt_start_known": response.attempted_at is not None,
+                    "identity_observation_id": self.identity_evidence_id,
                 },
                 attempted_at=response.attempted_at or receipt,
                 received_at=receipt,
@@ -162,7 +182,24 @@ class Repository:
     ) -> int:
         if record.ins_code != self.ins_code:
             raise ValueError("metadata belongs to another instrument")
-        observation_id = await self.observation(run_id, response, kind=kind)
+        self.identity_evidence_id = None
+        observation_id = await self.conn.scalar(
+            sa.select(t.observations.c.observation_id)
+            .join(
+                t.instruments,
+                t.instruments.c.metadata_observation_id == t.observations.c.observation_id,
+            )
+            .where(
+                t.instruments.c.ins_code == self.ins_code,
+                t.observations.c.ins_code == self.ins_code,
+                t.observations.c.received_at == response.received_at,
+                t.observations.c.raw_sha256 == hashlib.sha256(response.raw_body).hexdigest(),
+                t.observations.c.source_kind == kind,
+            )
+        )
+        if observation_id is None:
+            observation_id = await self.observation(run_id, response, kind=kind)
+        self.identity_evidence_id = int(observation_id)
         await self.conn.execute(
             t.instruments.update()
             .where(t.instruments.c.ins_code == self.ins_code)
@@ -273,6 +310,31 @@ class Repository:
         prior = await self.conn.execute(sa.select(t.daily).where(*where).with_for_update())
         old = prior.mappings().one_or_none()
         state, digest = financial_state(record), canonical_hash(financial_state(record))
+        if acceptance == "observed" and (old is None or old["financial_hash"] != digest):
+            pending = (
+                await self.conn.scalars(
+                    sa.select(t.quarantine.c.raw_row).where(
+                        t.quarantine.c.ins_code == self.ins_code,
+                        t.quarantine.c.trading_date == record.trading_date,
+                        t.quarantine.c.record_kind == "daily",
+                        t.quarantine.c.status == "open",
+                    )
+                )
+            ).all()
+            for raw in pending:
+                try:
+                    candidate = parse_daily(raw, self.ins_code)
+                    numeric_values(candidate)
+                except (SourceDataError, ValueError):
+                    continue
+                await self.quarantine_row(
+                    observation_id,
+                    row_index,
+                    record.raw,
+                    "unresolved_valid_source_conflict",
+                    day=record.trading_date,
+                )
+                return "conflict"
         # Another endpoint's disagreement cannot replace a reconciled candidate.
         if (
             old
@@ -368,6 +430,11 @@ class Repository:
             "archive_completeness": "unproven",
         }
         now = utcnow()
+        checkpoint = await self.conn.scalar(
+            sa.select(t.runs.c.checkpoint).where(
+                t.runs.c.run_id == run_id, t.runs.c.ins_code == self.ins_code
+            )
+        )
         await self.conn.execute(
             t.runs.update()
             .where(t.runs.c.run_id == run_id, t.runs.c.ins_code == self.ins_code)
@@ -375,7 +442,11 @@ class Repository:
                 status=result["status"],
                 ended_at=now,
                 summary=json_safe(result),
-                checkpoint={"phase": "committed", "accepted": result.get("accepted", 0)},
+                checkpoint={
+                    **(checkpoint or {}),
+                    "phase": "committed",
+                    "accepted": result.get("accepted", 0),
+                },
             )
         )
         await self.conn.execute(
@@ -725,7 +796,7 @@ class Repository:
                     ended_at=now,
                     failure_category=category,
                     summary={"status": state, "failure_category": category},
-                    checkpoint={"phase": "failed_before_data_commit"},
+                    checkpoint={**old["checkpoint"], "phase": "failed_before_data_commit"},
                 )
             )
             await self.conn.execute(

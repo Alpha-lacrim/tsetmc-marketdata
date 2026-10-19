@@ -24,7 +24,11 @@ tsetmc-marketdata = "tsetmc_marketdata.cli:main"
 dev = ["pytest>=8.3,<9", "pytest-asyncio>=1,<2", "pytest-socket>=0.7,<1", "ruff>=0.12,<1", "mypy>=1.16,<2"]
 
 [tool.hatch.build]
-exclude = ["/.local/**", "/docs/evidence/**", "/.venv/**", "/output/**", "/dist/**"]
+exclude = [
+    "/.local/**", "/docs/evidence/**", "/.venv/**", "/output/**", "/dist/**",
+    # Local conversation notes are unrelated to application distributions.
+    "/TSECMC_ConvHistory/**",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tsetmc_marketdata"]
