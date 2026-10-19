@@ -1,4 +1,4 @@
-"""Explicit, bounded probes and offline conversion. No continuous collection."""
+"""Bounded source probes, local database jobs and explicitly activated manual polling."""
 
 from __future__ import annotations
 
@@ -12,6 +12,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import sqlalchemy as sa
+
+from tsetmc_marketdata import db_cli
 from tsetmc_marketdata.adapters.chartdata import to_chartdata
 from tsetmc_marketdata.config import PILOT_INS_CODE, Settings, require_pilot
 from tsetmc_marketdata.errors import ErrorKind, SourceDataError, TSETMCError
@@ -24,6 +27,7 @@ from tsetmc_marketdata.parsing import (
     parse_targeted_daily,
 )
 from tsetmc_marketdata.providers.http_client import JSONResponse, TSETMCClient
+from tsetmc_marketdata.storage.config import StorageError
 from tsetmc_marketdata.utils.dates import calendar_gaps, parse_source_date
 
 
@@ -97,6 +101,7 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument(
                 "--kind", choices=("history", "current", "instrument"), default="history"
             )
+    db_cli.configure(sub)
     return parser
 
 
@@ -161,6 +166,8 @@ async def _payload(args: argparse.Namespace) -> tuple[dict[str, Any], datetime |
 
 
 async def run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+    if args.command in db_cli.COMMANDS:
+        return await db_cli.run(args)
     require_pilot(args.ins_code)
     payload, receipt = await _payload(args)
     if args.command == "inspect-fields":
@@ -223,6 +230,16 @@ def main(argv: list[str] | None = None) -> int:
         result, code = asyncio.run(run(args))
     except TSETMCError as exc:
         result, code = exc.as_dict(), 1
+    except StorageError as exc:
+        result, code = {"error": exc.category, "message": str(exc)}, 1
+    except sa.exc.SQLAlchemyError:
+        result, code = (
+            {
+                "error": "postgres_write_failure",
+                "message": "PostgreSQL operation failed; inspect durable collection status",
+            },
+            1,
+        )
     except ValueError as exc:
         result, code = {"error": "invalid_input", "message": str(exc)}, 1
     except OSError as exc:

@@ -26,3 +26,30 @@ jobs:
       - run: uv run --offline ruff format --check .
       - run: uv run --offline mypy
       - run: uv run --offline pytest
+
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16.1
+        env:
+          POSTGRES_DB: tsetmc_marketdata
+          POSTGRES_USER: tsetmc_owner
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tsetmc_owner -d tsetmc_marketdata"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      # Disposable CI credential only; never a local or company password.
+      TSETMC_TEST_ADMIN_URL: postgresql+asyncpg://tsetmc_owner:synthetic-ci-only@127.0.0.1:5432/tsetmc_marketdata
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run --offline pytest tests/integration --postgres

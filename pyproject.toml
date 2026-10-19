@@ -5,10 +5,17 @@ build-backend = "hatchling.build"
 [project]
 name = "tsetmc-marketdata"
 version = "0.1.0"
-description = "Independent TSETMC source qualification and daily ChartData adapter"
+description = "Independent TSETMC PostgreSQL collector and daily ChartData adapter"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["httpx>=0.28.1,<0.29", "jdatetime>=5.2,<6", "tzdata>=2025.2"]
+dependencies = [
+    "alembic>=1.16,<2",
+    "asyncpg>=0.30,<1",
+    "httpx>=0.28.1,<0.29",
+    "jdatetime>=5.2,<6",
+    "sqlalchemy[asyncio]>=2.0.55,<2.1",
+    "tzdata>=2025.2",
+]
 
 [project.scripts]
 tsetmc-marketdata = "tsetmc_marketdata.cli:main"
@@ -22,6 +29,11 @@ exclude = ["/.local/**", "/docs/evidence/**", "/.venv/**", "/output/**", "/dist/
 [tool.hatch.build.targets.wheel]
 packages = ["src/tsetmc_marketdata"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"migrations" = "tsetmc_marketdata/migrations"
+"alembic.ini" = "tsetmc_marketdata/alembic.ini"
+"config/instruments.example.json" = "tsetmc_marketdata/data/instruments.json"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers --disable-socket --allow-hosts=127.0.0.1,::1 --allow-unix-socket"
@@ -29,6 +41,7 @@ asyncio_mode = "auto"
 markers = [
     "live: explicit, bounded internet tests; requires --live",
     "private_capture: regression tests requiring locally retained, unpublished source captures",
+    "postgres: integration tests using independently created disposable PostgreSQL databases",
 ]
 
 [tool.ruff]

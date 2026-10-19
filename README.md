@@ -1,16 +1,19 @@
-# TSETMC Market Data — Milestone 1
+# TSETMC Market Data — Milestone 2
 
 Independent Python foundation for a TSETMC HTTP/JSON collector and the Go
 `ChartData` daily chart contract. Authorized pilot: **فولاد — فولاد مبارکه اصفهان**,
 `insCode` **`46348559193224090`** (a string).
 
-No database, migrations, containers, polling service, synchronization, or FastAPI
-integration exists here. TradingView projects and runtime resources are independent.
+Milestone 2 adds independent PostgreSQL 16.1 persistence, Alembic migrations,
+historical import/corrections/reconciliation, current snapshots/latest state,
+recovery and database-backed ChartData export. TradingView projects and runtime
+resources remain completely independent.
 Repository: [Alpha-lacrim/tsetmc-marketdata](https://github.com/Alpha-lacrim/tsetmc-marketdata).
-This is a development baseline, with no production-readiness claim. PostgreSQL
-persistence, continuous price collection, automated historical backfill, durable
-synchronization, company FastAPI integration and production deployment are planned
-work and are not implemented.
+This is a development implementation, with no production-readiness claim. Polling
+is opt-in and limited to an explicit manual window; no unattended service is enabled.
+Automated historical scheduling, durable remote synchronization, company FastAPI
+integration and production deployment are not implemented. Only فولاد is live;
+schema keys, ownership and reusable collectors already support multiple instruments.
 
 ## Setup
 
@@ -39,8 +42,72 @@ PyCharm: select `.venv/Scripts/python.exe` on Windows or `.venv/bin/python` on
 Linux. `.env.example` documents every variable; `.env` files are **not** loaded
 automatically. Export values in the shell or configure PyCharm's environment.
 `uv pip install .` also installs the package; `tsetmc-marketdata` is the console command.
-Runtime dependencies are httpx, jdatetime (presentation calendar), and tzdata
-(portable IANA zones, including Windows). No third-party market-data client is used.
+Runtime dependencies are httpx, jdatetime, tzdata, SQLAlchemy 2.x, asyncpg and Alembic.
+Exact versions are pinned in uv.lock. No third-party market-data client is used.
+
+## Independent local PostgreSQL
+
+Inspect Docker resources and listening ports before choosing a host port. The
+following commands create only the `tsetmc-m2-local` project, its `pgdata` volume,
+`tsetmc_marketdata` database and separate owner/collector roles. Commands work in
+PowerShell and Linux from the checkout root:
+
+```powershell
+docker compose ls
+docker ps -a
+docker volume ls
+# Windows: Get-NetTCPConnection -State Listen | Where-Object LocalPort -eq 5542
+# Linux: ss -ltn
+uv run python scripts/local_db.py init --port 5542
+uv run python scripts/local_db.py start
+uv run python scripts/local_db.py migrate
+uv run python scripts/local_db.py run -- db-status
+```
+
+`init` refuses to overwrite existing private configuration. Secrets are randomly
+generated in ignored `.local/database.json` and `.local/postgres.env`; restrict
+access to these files and keep them with your private backups. The helper supplies
+credentials to child environments without printing them. The database is published
+only on loopback. Startup and migrations are separate; collectors never migrate.
+An existing local installation should start at `db-status`, not rerun `init`.
+
+```powershell
+uv run python scripts/local_db.py run -- backfill-history
+uv run python scripts/local_db.py run -- refresh-history --source-limit 20
+uv run python scripts/local_db.py run -- reconcile-history --date 20250729
+uv run python scripts/local_db.py run -- observe-current
+uv run python scripts/local_db.py run -- collection-status
+uv run python scripts/local_db.py run -- export-db-chartdata --selection accepted-unverified --output output/stored-chartdata.json
+uv run python scripts/local_db.py test -- --postgres -q
+```
+
+Jobs verify metadata and the configured instrument identifier, then use the same
+Milestone 1 client/parsers. `--dry-run` on a one-shot job performs source reads and
+validation in a read-only database transaction. `--instrument-config` selects an
+extensible JSON configuration; the CLI still authorizes only the live pilot.
+`TSETMC_MAX_CONNECTIONS` controls the reusable HTTP pool, and
+`TSETMC_PACING_SECONDS` controls request pacing. One instrument has one database
+owner, so writes and polling never overlap for that instrument.
+
+**Finality is unverified.** Default database export selects only explicitly finalized
+records and currently returns eight empty arrays, with excluded counts in the
+report. Use `--selection accepted-unverified` deliberately for accepted source
+observations. Reconciliation does not establish candle finality. No automatic
+finalization or manual finalization command is implemented.
+
+Live Milestone 2 verification on 2026-10-19 stored **4,662 accepted dates**,
+2007-03-11 through 2026-10-18, and one current snapshot. A repeated full audit found
+4,662 unchanged records and zero revisions. Unlike the original capture below,
+the new list reports July 29 open=2956 and agrees with the dated endpoint. The
+original anomaly and its repair were separately reproduced from private captures
+in a disposable database. See [actual verification](docs/milestone-2-verification.md).
+
+Polling remains disabled unless explicitly invoked, for example with a short,
+future aware `--until` value and `--interval 30`. It uses an operator-selected
+window, not a guessed exchange calendar; no full market-session qualification is
+claimed. See [operations](docs/collector-operations.md), [schema](docs/database-schema.md),
+[current-price policy](docs/current-price-collection.md), and
+[backup/recovery](docs/recovery-and-backup.md).
 
 ## Offline verification
 
@@ -59,7 +126,10 @@ additional capture regressions run only when the original private capture set is
 present; otherwise they are explicitly skipped. The three live tests are also
 skipped by default. Synthetic tests do not prove historical source behavior.
 External DNS/connections are blocked; loopback sockets are allowed for Windows
-asyncio internals. See [verification](docs/pilot-verification.md).
+asyncio internals and opt-in PostgreSQL tests. Those tests use uniquely named
+disposable databases and are skipped by default. The Docker service hostname is
+allowed only for explicitly selected database tests. See
+[Milestone 1 verification](docs/pilot-verification.md).
 
 ## Explicit live probes
 
@@ -145,7 +215,8 @@ not an observed trading instant. Source current clocks are interpreted in
 instants. No dates are filled, and calendar gaps imply no claim about trading sessions.
 See [timestamp and frontend details](docs/frontend-contract.md),
 [14-column mapping](docs/field-mapping.md), [API research](docs/api-research.md),
-[architecture](docs/architecture.md), and [Milestone 2 proposal](docs/next-milestones.md).
+[architecture](docs/architecture.md), [Milestone 2 design](docs/milestone-2-design.md),
+and [next milestone](docs/next-milestones.md).
 
 ## Publication and licensing
 

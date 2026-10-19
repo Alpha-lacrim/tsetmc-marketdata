@@ -33,6 +33,7 @@ class Settings:
     pool_timeout: float = 5
     total_timeout: float = 90
     max_retries: int = 2
+    max_connections: int = 4
     pacing_seconds: float = 1
     backoff_seconds: float = 0.5
     max_backoff_seconds: float = 10
@@ -52,8 +53,10 @@ class Settings:
             raise ValueError("base URL must end with /")
         if type(self.max_retries) is not int or not 0 <= self.max_retries <= 5:
             raise ValueError("max_retries must be between 0 and 5")
+        if type(self.max_connections) is not int or not 1 <= self.max_connections <= 32:
+            raise ValueError("max_connections must be between 1 and 32")
         for field in fields(self):
-            if field.name in {"base_url", "max_retries"}:
+            if field.name in {"base_url", "max_retries", "max_connections"}:
                 continue
             value = getattr(self, field.name)
             if not math.isfinite(value) or value < 0:
@@ -63,11 +66,14 @@ class Settings:
 
     @classmethod
     def from_env(cls) -> Settings:
-        defaults = cls()
         values: dict[str, str | float | int] = {}
         for field in fields(cls):
             value = os.getenv(f"TSETMC_{field.name.upper()}")
             if value is not None:
-                default = getattr(defaults, field.name)
-                values[field.name] = type(default)(value)
+                if field.name == "base_url":
+                    values[field.name] = value
+                elif field.name in {"max_retries", "max_connections"}:
+                    values[field.name] = int(value)
+                else:
+                    values[field.name] = float(value)
         return cls(**values)  # type: ignore[arg-type]

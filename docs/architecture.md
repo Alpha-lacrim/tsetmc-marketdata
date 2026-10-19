@@ -1,5 +1,10 @@
 # Milestone 1 architecture
 
+Milestone 2 adds independent local PostgreSQL storage and collectors. See
+[current design](milestone-2-design.md), [schema](database-schema.md), and
+[operations](collector-operations.md). The exclusions below describe the original
+Milestone 1 scope; its pure source/model/presentation boundary remains in use.
+
 `HTTP JSONResponse → pure parsers → typed DailyRecord / CurrentPrice / Instrument`
 
 `validated DailyRecord sequence → pure ChartData adapter → a–h JSON`

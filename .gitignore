@@ -16,3 +16,6 @@ output/
 # Local audit backups, genuine source captures and derived qualification evidence.
 .local/
 /docs/evidence/
+*.dump
+*.backup
+pgdata/

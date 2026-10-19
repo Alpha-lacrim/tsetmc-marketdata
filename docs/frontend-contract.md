@@ -1,5 +1,11 @@
 # Exact company Go contract
 
+Milestone 2 uses this unchanged adapter for stored records via
+`export-db-chartdata`. The default selects explicitly finalized records only;
+source finality remains unverified, so use `--selection accepted-unverified`
+explicitly to export accepted source observations. See
+[operations](collector-operations.md) for the selection report and placeholder counts.
+
 ```go
 type ChartData struct {
     Time   []int64   `json:"a"`

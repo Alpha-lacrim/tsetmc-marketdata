@@ -1,0 +1,22 @@
+name: tsetmc-m2-local
+services:
+  postgres:
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: tsetmc_marketdata
+      POSTGRES_USER: tsetmc_owner
+      POSTGRES_PASSWORD: ${TSETMC_PG_PASSWORD:?Set an independent local owner password}
+      TSETMC_COLLECTOR_PASSWORD: ${TSETMC_COLLECTOR_PASSWORD:?Set an independent collector password}
+    ports:
+      - "127.0.0.1:${TSETMC_PG_PORT:-5542}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-collector.sh:/docker-entrypoint-initdb.d/10-collector.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tsetmc_owner -d tsetmc_marketdata"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: "no"
+volumes:
+  pgdata:

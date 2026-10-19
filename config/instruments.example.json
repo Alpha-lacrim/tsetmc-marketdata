@@ -1,0 +1,11 @@
+{
+  "instruments": [
+    {
+      "ins_code": "46348559193224090",
+      "symbol": "فولاد",
+      "instrument_id": "IRO1FOLD0001",
+      "enabled": true
+    }
+  ],
+  "live_authorization": "Milestone 2 permits only the pilot; other real instruments remain disabled."
+}

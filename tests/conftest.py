@@ -10,10 +10,17 @@ from tsetmc_marketdata.jsonio import loads_source
 
 def pytest_addoption(parser):
     parser.addoption("--live", action="store_true", help="explicitly opt into bounded live tests")
+    parser.addoption(
+        "--postgres", action="store_true", help="use disposable local PostgreSQL databases"
+    )
 
 
 def pytest_collection_modifyitems(config, items):
     for item in items:
+        if "postgres" in item.keywords and not config.getoption("--postgres"):
+            item.add_marker(pytest.mark.skip(reason="PostgreSQL integration requires --postgres"))
+        elif "postgres" in item.keywords:
+            item.add_marker(pytest.mark.allow_hosts(["127.0.0.1", "::1", "postgres"]))
         if "live" in item.keywords and not config.getoption("--live"):
             item.add_marker(pytest.mark.skip(reason="live API tests require explicit --live"))
         elif "live" in item.keywords:
@@ -27,7 +34,10 @@ def block_external_dns(request, monkeypatch):
     original = socket.getaddrinfo
 
     def guarded(host, *args, **kwargs):
-        if host not in ("127.0.0.1", "::1", "localhost", None):
+        local = {"127.0.0.1", "::1", "localhost", None}
+        if request.node.get_closest_marker("postgres") and request.config.getoption("--postgres"):
+            local.add("postgres")
+        if host not in local:
             raise AssertionError("external DNS/network access forbidden in offline tests")
         return original(host, *args, **kwargs)
 

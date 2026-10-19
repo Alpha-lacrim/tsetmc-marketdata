@@ -1,5 +1,13 @@
 # TSETMC API qualification — 2026-10-19
 
+The observations in the original sections below are the Milestone 1 capture set.
+A later Milestone 2 live retrieval on the same date returned **4,662 accepted
+dates**, including July 29 opening=2956, which agrees with the dated endpoint.
+The earlier 4,661-row capture and opening=0 anomaly remain preserved privately as
+original evidence, not asserted as current upstream behavior. The 285 unusual
+official closes persisted in the newer archive. See
+[reconciliation](reconciliation.md) and [Milestone 2 verification](milestone-2-verification.md).
+
 Base URL: `https://cdn.tsetmc.com/api/`. Only insCode `46348559193224090` was
 requested. This research distinguishes our observations from third-party claims.
 No bulk-market endpoint was requested, because this milestone authorizes one instrument.

@@ -26,6 +26,7 @@ class JSONResponse:
     received_at: datetime
     status_code: int
     path: str
+    attempted_at: datetime | None = None
 
 
 def _dns_failure(exc: BaseException) -> bool:
@@ -57,7 +58,10 @@ class TSETMCClient:
                 write=self.settings.write_timeout,
                 pool=self.settings.pool_timeout,
             ),
-            limits=httpx.Limits(max_connections=4, max_keepalive_connections=4),
+            limits=httpx.Limits(
+                max_connections=self.settings.max_connections,
+                max_keepalive_connections=self.settings.max_connections,
+            ),
             transport=transport,
             follow_redirects=False,
             headers={"Accept": "application/json", "User-Agent": "tsetmc-marketdata/0.1.0"},
@@ -131,6 +135,7 @@ class TSETMCClient:
             await self._pace()
             progress[0] = attempt
             response = None
+            attempted_at = datetime.now(UTC)
             try:
                 response = await self._client.get(path)
             except httpx.TimeoutException as exc:
@@ -160,7 +165,9 @@ class TSETMCClient:
                             status=status,
                             attempts=attempt,
                         )
-                    return JSONResponse(payload, response.content, received_at, status, path)
+                    return JSONResponse(
+                        payload, response.content, received_at, status, path, attempted_at
+                    )
                 kind = (
                     ErrorKind.RATE_LIMIT
                     if status == 429

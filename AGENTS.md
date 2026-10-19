@@ -2,10 +2,14 @@
 
 Keep all work in this independent repository. Never modify TradingView projects,
 connect to their databases, use their volumes, or reuse their runtime configuration.
-Milestone 1 supports only insCode `46348559193224090` (فولاد).
-Do not implement persistence, migrations, polling loops, synchronization, FastAPI,
-deployment, or other instruments without a later explicit task.
-Do not publish, push, or release without explicit user authorization.
+Milestone 2 authorizes independent PostgreSQL 16.1 storage, Alembic migrations,
+one-shot collectors and explicitly activated, bounded manual polling here only.
+Only insCode `46348559193224090` (فولاد) may be enabled or fetched live. Reusable
+storage and collection code must scope ownership, keys and provenance by instrument;
+use invented identities for isolation tests. Do not implement synchronization,
+company FastAPI integration, deployment or additional live instruments.
+Do not commit, push, tag, or release without additional explicit authorization.
+Preserve commit 87690cb1f03f2b3deecb122c58eb48c06dff4e06 and v0.1.0-milestone1.
 
 Use Python 3.12+, async httpx, Decimal source measurements, aware instants, and
 Gregorian trading dates. Preserve raw payloads. Never conflate pDrCotVal and pClosing,
@@ -18,3 +22,7 @@ been selected by the owner; do not add one without instruction.
 
 Run `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy`, and
 `uv run pytest` after changes. Follow the conventions documented in docs/.
+PostgreSQL tests are opt-in with --postgres and use unique disposable
+tsetmc_test_<hex> databases. Never delete a persistent database or Docker volume.
+Collector startup must verify the schema, never migrate implicitly. Keep secrets,
+database backups and live exports under ignored .local/ or output/ only.
