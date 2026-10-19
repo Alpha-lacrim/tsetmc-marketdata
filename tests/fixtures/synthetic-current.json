@@ -1,0 +1,30 @@
+{
+  "closingPriceInfo": {
+    "insCode": "0",
+    "dEven": 20260321,
+    "hEven": 123045,
+    "lastHEven": 123044,
+    "finalLastDate": 20260321,
+    "instrumentState": {
+      "insCode": null,
+      "cEtaval": "A ",
+      "cEtavalTitle": "مجاز",
+      "dEven": 0,
+      "hEven": 0
+    },
+    "pDrCotVal": 1030.50,
+    "pClosing": 1020.25,
+    "priceYesterday": 1000,
+    "priceFirst": 1010.25,
+    "priceMax": 1040.75,
+    "priceMin": 1005,
+    "zTotTran": 1234.0,
+    "qTotTran5J": 7000000123,
+    "qTotCap": 7154000125700.25,
+    "priceChange": 0,
+    "last": true,
+    "id": 0,
+    "iClose": false,
+    "yClose": false
+  }
+}

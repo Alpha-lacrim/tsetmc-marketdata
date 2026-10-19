@@ -1,0 +1,21 @@
+{
+  "closingPriceDaily": {
+    "insCode": "46348559193224090",
+    "dEven": 20260321,
+    "hEven": 123000,
+    "zTotTran": 1234.0,
+    "qTotTran5J": 7000000123.0,
+    "qTotCap": 7154000125700.25,
+    "priceYesterday": 1000.0,
+    "priceFirst": 1010.25,
+    "pDrCotVal": 1030.50,
+    "priceMax": 1040.75,
+    "priceMin": 1005.0,
+    "pClosing": 1020.25,
+    "priceChange": 0.0,
+    "last": true,
+    "id": 0,
+    "iClose": false,
+    "yClose": false
+  }
+}

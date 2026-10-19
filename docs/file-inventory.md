@@ -1,0 +1,59 @@
+# Public baseline file inventory
+
+54 publishable files. Genuine captures and derived evidence, audit backups,
+Git metadata, environments, caches and build output are excluded.
+
+- `.env.example`
+- `.gitattributes`
+- `.github/workflows/ci.yml`
+- `.gitignore`
+- `.python-version`
+- `AGENTS.md`
+- `CODEX.md`
+- `README.md`
+- `docs/api-research.md`
+- `docs/architecture.md`
+- `docs/field-mapping.md`
+- `docs/file-inventory.md`
+- `docs/frontend-contract.md`
+- `docs/milestone-1-report.md`
+- `docs/next-milestones.md`
+- `docs/pilot-verification.md`
+- `docs/publication-audit.md`
+- `docs/publication-verification.md`
+- `examples/README.md`
+- `examples/synthetic-chartdata-legacy.json`
+- `examples/synthetic-chartdata.json`
+- `pyproject.toml`
+- `scripts/qualify_source.py`
+- `src/tsetmc_marketdata/__init__.py`
+- `src/tsetmc_marketdata/adapters/__init__.py`
+- `src/tsetmc_marketdata/adapters/chartdata.py`
+- `src/tsetmc_marketdata/cli.py`
+- `src/tsetmc_marketdata/config.py`
+- `src/tsetmc_marketdata/errors.py`
+- `src/tsetmc_marketdata/jsonio.py`
+- `src/tsetmc_marketdata/models/__init__.py`
+- `src/tsetmc_marketdata/models/current.py`
+- `src/tsetmc_marketdata/models/daily.py`
+- `src/tsetmc_marketdata/models/instrument.py`
+- `src/tsetmc_marketdata/parsing.py`
+- `src/tsetmc_marketdata/providers/__init__.py`
+- `src/tsetmc_marketdata/providers/closing_prices.py`
+- `src/tsetmc_marketdata/providers/http_client.py`
+- `src/tsetmc_marketdata/providers/instruments.py`
+- `src/tsetmc_marketdata/utils/__init__.py`
+- `src/tsetmc_marketdata/utils/dates.py`
+- `tests/conftest.py`
+- `tests/fixtures/README.md`
+- `tests/fixtures/synthetic-current.json`
+- `tests/fixtures/synthetic-daily.json`
+- `tests/fixtures/synthetic-history.json`
+- `tests/fixtures/synthetic-instrument.json`
+- `tests/live/test_pilot.py`
+- `tests/unit/test_captured_pilot.py`
+- `tests/unit/test_cli.py`
+- `tests/unit/test_dates_chartdata.py`
+- `tests/unit/test_http.py`
+- `tests/unit/test_parsing.py`
+- `uv.lock`
