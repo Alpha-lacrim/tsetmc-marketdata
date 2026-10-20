@@ -21,3 +21,11 @@ subsequently authorized committing and pushing the reviewed Milestone 3A changes
 directly to main. This publication authorization does not include a tag or release.
 Do not start company integration or remote synchronization, activate unattended
 collection, or expand live instruments.
+
+Milestone 3B-1 separately authorizes only the local source outbox, source migration
+0004_outbox and synthetic/disposable PG16.1 qualification. Preserve the original
+pilot as read-only; do not migrate or seed it. No network worker, real receipt,
+producer credential, company schema/route or deployment is authorized. Stage 4
+coordinator/anchor behavior and Stage 5 real archive transfer remain deferred.
+The owner subsequently authorized committing and pushing these reviewed changes
+directly to main. This authorization does not include a tag, release or deployment.

@@ -13,6 +13,7 @@ dependencies = [
     "asyncpg>=0.30,<1",
     "httpx>=0.28.1,<0.29",
     "jdatetime>=5.2,<6",
+    "jsonschema>=4.23,<5",
     "sqlalchemy[asyncio]>=2.0.55,<2.1",
     "tzdata>=2025.2",
 ]
@@ -21,7 +22,7 @@ dependencies = [
 tsetmc-marketdata = "tsetmc_marketdata.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8.3,<9", "pytest-asyncio>=1,<2", "pytest-socket>=0.7,<1", "ruff>=0.12,<1", "mypy>=1.16,<2"]
+dev = ["pytest>=8.3,<9", "pytest-asyncio>=1,<2", "pytest-socket>=0.7,<1", "ruff>=0.12,<1", "mypy>=1.16,<2", "types-jsonschema>=4.23,<5"]
 
 [tool.hatch.build]
 exclude = [
@@ -37,6 +38,7 @@ packages = ["src/tsetmc_marketdata"]
 "migrations" = "tsetmc_marketdata/migrations"
 "alembic.ini" = "tsetmc_marketdata/alembic.ini"
 "config/instruments.example.json" = "tsetmc_marketdata/data/instruments.json"
+"docs/contracts/milestone3b/schema.json" = "tsetmc_marketdata/data/tsetmc.v1.schema.json"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

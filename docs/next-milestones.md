@@ -26,12 +26,24 @@ unverified; the owner explicitly clarified this. No company server was contacted
 - [Future acceptance tests](milestone-3b-test-plan.md)
 - [Incremental implementation/release sequence](milestone-3b-implementation-sequence.md)
 
-## Next authorization: small implementation stages
+## Milestone 3B-1: source publication foundation
 
-Review contracts and unit/redistribution evidence first. Then separately authorize
-source outbox 0004, company schema/control-plane 0011, additive ingestion, independent
-worker, initial enrollment/parity, and shared READ/frontend work in that order with
-stage tests. These are proposed revisions after the inspected heads; reserve new
+Source migration 0004_outbox and local transactional publication/staging primitives
+are implemented and qualified only on synthetic disposable PostgreSQL 16.1.
+See [implementation/deviations](milestone-3b1-design.md),
+[verification evidence](milestone-3b1-verification.md) and
+[safe operations](source-outbox-operations.md). The original pilot is unchanged;
+no actual archive seed, network worker, producer or company endpoint is activated.
+The previous M3B-D specification remains a published design at
+0a770a050e1939b1fa26ba00c86ff45696ea366f.
+
+## Next authorization: M3B-2 company INGEST/storage
+
+Review contract/units/redistribution evidence and the real company baseline first.
+Next separately authorize company schema/control-plane 0011 and additive TSETMC
+ingestion, preserving the existing TradingView contracts. Independent worker,
+producer coordinator/external anchor, real enrollment/parity and shared READ/frontend
+remain later stages, with their own tests. Company revision IDs are proposed; reserve new
 numbers if intervening work changes those heads. The candidate company version is
 proposed 1.2.0rc1, not an existing release. Preserve frozen 1.1.0rc1 and all TradingView
 contracts; do not run destination migrations on a source database.

@@ -8,7 +8,7 @@ import sys
 import pytest
 import sqlalchemy as sa
 
-from tsetmc_marketdata.storage.database import verify_schema
+from tsetmc_marketdata.storage.database import SCHEMA_REVISION, verify_schema
 
 from .conftest import ROOT, migration
 from .helpers import SyntheticSource
@@ -68,6 +68,6 @@ asyncio.run(run())
         assert await conn.scalar(sa.text("SELECT to_regclass('scheduled_jobs')")) is None
     await migration(db.engine)
     async with db.read() as conn:
-        assert (await verify_schema(conn))["schema_revision"] == "0003_scheduling"
+        assert (await verify_schema(conn))["schema_revision"] == SCHEMA_REVISION
         for name, rows in before.items():
             assert (await conn.execute(sa.text("SELECT * FROM " + name))).all() == rows

@@ -52,7 +52,7 @@ async def review_daily(
         session_evidence=session_evidence,
         grace_seconds=grace_seconds,
     )
-    async with repo.atomic():
+    async with repo.atomic(ingest=True):
         previous = (
             (
                 await repo.conn.execute(
@@ -159,6 +159,8 @@ async def review_daily(
             .where(t.daily.c.ins_code == repo.ins_code, t.daily.c.trading_date == day)
             .values(finalization_state=state)
         )
+        repo.publication_days.add(day)
+        repo.publication_reviews[day] = review_id
     return {
         "review_id": str(review_id),
         "finalization_state": state,

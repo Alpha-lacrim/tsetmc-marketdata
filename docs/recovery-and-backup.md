@@ -1,5 +1,12 @@
 # Recovery and backup
 
+**M3B-1 boundary:** current source code expects 0004_outbox, but this task did not
+contact, migrate, seed or back up the original pilot. Its last reported head is
+0003_scheduling, not a fresh verification. The commands below remain historical
+operator guidance and must not be run against that pilot during M3B-1. The new
+qualification used only synthetic disposable databases; read
+[source outbox operations](source-outbox-operations.md) before any future upgrade.
+
 M3A head is `0003_scheduling`. For an existing M2 backup, restore-check with
 `--expected-revision 0002_instrument_links` before upgrading. Default restore-check
 expects current head. [M3A operation](automatic-collector.md) covers durable slot

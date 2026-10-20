@@ -57,12 +57,24 @@ class Repository:
         self.conn, self.ins_code, self.fault = conn, validate_ins_code(ins_code), fault
         self.identity_evidence_id: int | None = None
         self.run_context: dict[str, Any] = {}
+        self.publication_days: set[date] = set()
+        self.publication_current = False
+        self.publication_status = False
+        self.publication_reviews: dict[date, UUID] = {}
 
     @asynccontextmanager
     async def atomic(self, *, ingest: bool = False) -> AsyncIterator[None]:
+        from tsetmc_marketdata.storage.outbox import SourceOutbox
+
+        self.publication_days = set()
+        self.publication_reviews = {}
+        self.publication_current = self.publication_status = False
         async with self.conn.begin():
             await fence(self.conn, self.ins_code)
             yield
+            await SourceOutbox(self).flush(
+                self.publication_days, self.publication_current, self.publication_status
+            )
             await fence(self.conn, self.ins_code)
             if ingest and self.fault:
                 self.fault("before_commit")
@@ -217,6 +229,7 @@ class Repository:
         return observation_id
 
     async def mark_coverage(self, day: date, state: str, observation_id: int) -> None:
+        self.publication_days.add(day)
         await self.conn.execute(
             insert(t.coverage)
             .values(
@@ -243,6 +256,9 @@ class Repository:
         record_kind: str = "daily",
     ) -> int:
         day = day or identifiable_day(raw)
+        if day is not None and record_kind == "daily":
+            self.publication_days.add(day)
+        self.publication_status = True
         fingerprint = canonical_hash(
             {
                 "instrument": self.ins_code,
@@ -295,6 +311,7 @@ class Repository:
     ) -> str:
         if record.ins_code != self.ins_code:
             raise ValueError("daily record belongs to another instrument")
+        self.publication_days.add(record.trading_date)
         try:
             measurements = numeric_values(record)
         except ValueError:
@@ -422,6 +439,7 @@ class Repository:
     async def finish(
         self, run_id: UUID, job: str, summary: dict[str, Any], *, partial: bool = False
     ) -> dict[str, Any]:
+        self.publication_status = True
         result = {
             "run_id": str(run_id),
             "ins_code": self.ins_code,
@@ -482,7 +500,7 @@ class Repository:
                 day = identifiable_day(raw)
                 if day is not None:
                     source_indices.setdefault(day, index)
-            for record in parsed.records:
+            for record in sorted(parsed.records, key=lambda row: row.trading_date):
                 counts[
                     await self.daily_record(
                         record, observation_id, row_index=source_indices[record.trading_date]
@@ -526,7 +544,8 @@ class Repository:
         async with self.atomic(ingest=True):
             await self.metadata(run_id, instrument, metadata_response, kind=kind, active=active)
             accepted, unresolved, corrected = 0, 0, 0
-            for day, record, response, error in candidates:
+            for day, record, response, error in sorted(candidates, key=lambda item: item[0]):
+                self.publication_days.add(day)
                 if record is not None:
                     try:
                         numeric_values(record)
@@ -707,6 +726,7 @@ class Repository:
                 .returning(t.snapshots.c.snapshot_id)
             )
             if decision.update:
+                self.publication_current = True
                 await self.conn.execute(
                     insert(t.latest)
                     .values(ins_code=self.ins_code, snapshot_id=snapshot_id, updated_at=utcnow())
@@ -787,6 +807,7 @@ class Repository:
                     )
                 )
             now = utcnow()
+            self.publication_status = True
             state = "interrupted" if category == "cancelled" else "failed"
             await self.conn.execute(
                 t.runs.update()

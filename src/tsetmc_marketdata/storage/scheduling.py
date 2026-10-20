@@ -99,6 +99,7 @@ class ScheduleStore:
                     },
                 )
             )
+            self.repo.publication_status = True
         return prior_runtime is not None
 
     async def rows(self) -> dict[str, dict[str, Any]]:
@@ -242,6 +243,7 @@ class ScheduleStore:
             )
             if change is not None:
                 values["last_financial_change_at"] = change
+            self.repo.publication_status = True
             await self.repo.conn.execute(
                 s.runtime.update()
                 .where(

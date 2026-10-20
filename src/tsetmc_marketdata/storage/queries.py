@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from tsetmc_marketdata.models.daily import DailyRecord
 from tsetmc_marketdata.storage import schema_v1 as t
 from tsetmc_marketdata.storage import schema_v3a as s
+from tsetmc_marketdata.storage import schema_v3b1 as p
 from tsetmc_marketdata.storage.database import fence
 from tsetmc_marketdata.storage.serialization import daily_from_row, json_safe
 
@@ -99,9 +100,54 @@ async def collection_report(conn: AsyncConnection, ins_code: str) -> dict[str, A
                 "absent_dates": "unknown; no inferred exchange calendar",
                 "latest": dict(current) if current else None,
                 "archive_completeness": "unproven",
+                "source_publication": await publication_report(conn, ins_code),
             }
         ),
     )
+
+
+async def publication_report(conn: AsyncConnection, ins_code: str) -> dict[str, Any]:
+    """Read-only status; does not register an instrument or acquire write ownership."""
+    dataset = (
+        (await conn.execute(sa.select(p.datasets).where(p.datasets.c.ins_code == ins_code)))
+        .mappings()
+        .one_or_none()
+    )
+    if not dataset:
+        return {"enabled": False, "enrolled": False, "network_delivery": False, "streams": []}
+    clocks = (
+        (
+            await conn.execute(
+                sa.select(p.clocks)
+                .where(p.clocks.c.ins_code == ins_code)
+                .order_by(p.clocks.c.stream)
+            )
+        )
+        .mappings()
+        .all()
+    )
+    return {
+        "enabled": dataset["enabled"],
+        "enrolled": dataset["enrolled"],
+        "network_delivery": False,
+        "streams": [
+            {
+                "stream": r["stream"],
+                "head": r["head"],
+                "acknowledged": r["acknowledged"],
+                "used_rows": r["used_rows"],
+                "used_bytes": r["used_bytes"],
+                "max_rows": r["max_rows"],
+                "max_bytes": r["max_bytes"],
+                "capacity": "critical"
+                if max(r["used_rows"] / r["max_rows"], r["used_bytes"] / r["max_bytes"]) >= 0.85
+                else "warning"
+                if max(r["used_rows"] / r["max_rows"], r["used_bytes"] / r["max_bytes"]) >= 0.7
+                else "ok",
+            }
+            for r in clocks
+        ],
+    }
 
 
 async def retain(
@@ -119,6 +165,12 @@ async def retain(
         ~sa.exists(
             sa.select(t.latest.c.snapshot_id).where(
                 t.latest.c.snapshot_id == t.snapshots.c.snapshot_id
+            )
+        ),
+        ~sa.exists(
+            sa.select(p.evidence.c.snapshot_id).where(
+                p.evidence.c.snapshot_id == t.snapshots.c.snapshot_id,
+                p.evidence.c.ins_code == ins_code,
             )
         ),
     )
@@ -146,6 +198,7 @@ async def retain(
         t.observations.c.request_parameters["identity_observation_id"].astext, sa.BigInteger
     )
     references.append(sa.select(identity_reference).where(identity_reference.is_not(None)))
+    references.append(sa.select(p.evidence.c.local_observation_id))
     body_candidate = sa.and_(
         t.observations.c.ins_code == ins_code,
         t.observations.c.received_at < now - timedelta(days=90),

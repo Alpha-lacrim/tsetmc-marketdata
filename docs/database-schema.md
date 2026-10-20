@@ -1,7 +1,9 @@
 # PostgreSQL schema
 
 Target PostgreSQL 16.1, SQLAlchemy 2.x + asyncpg, Alembic head
-`0003_scheduling` (after `0001_tsetmc` and `0002_instrument_links`). Migrations never seed an instrument.
+`0004_outbox` (after `0001_tsetmc`, `0002_instrument_links`, `0003_scheduling`).
+Migrations never seed an instrument. M3B-1 applied this head only in verified
+disposable databases; the original pilot was not contacted or migrated.
 Runtime schema verification rejects absent/incompatible revisions. New schema
 changes require an additive migration; do not edit an applied migration.
 
@@ -27,6 +29,16 @@ alter existing measurements or bulk finalization. Applied migration files and
 frozen schema metadata are immutable. See [M3A design](milestone-3a-design.md)
 for rationale and [confirmation policy](daily-finalization-policy.md) for checks.
 Downgrade/interrupted migration tests run only in disposable databases.
+
+M3B-1 adds seven tables, bringing a fresh source installation to **21** application
+tables: sync_datasets, sync_stream_clocks, sync_daily_heads, sync_outbox,
+sync_latest_pending, sync_evidence_refs and sync_batches. All use explicit
+instrument/epoch scope; four stream clocks are transactional row counters, never
+sequences. New tables are empty and capture is disabled after migration. Three
+trigger functions/four triggers protect immutable bindings/evidence/batch lifecycle;
+composite FKs and JSON identity/byte/hash checks prevent cross-instrument links.
+See [the implemented source design](milestone-3b1-design.md) for keys, grants,
+capacity accounting and deliberately deferred future worker/session tables.
 
 The nine measurements are `previous_close`, `opening_price`, `last_traded_price`,
 `high`, `low`, `official_close`, `trade_count`, `traded_volume`, `traded_value`.
@@ -64,8 +76,8 @@ Coverage states: observed, quarantined, reconciled, confirmed_no_trade, unknown.
 Confirmed no-trade requires explicitly observed zero count, volume **and** value;
 it does not establish an exchange holiday. Missing calendar dates have no invented
 rows and remain unknown. All records initially have finalization `source_unverified`.
-The schema reserves `operator_finalized`, but no operator finalization workflow is
-qualified or implemented in this milestone.
+M3A implements explicit hash-bound operator confirmation/revocation; it does not
+establish upstream finality. M3B-1 publishes those changes without changing policy.
 
 Collector role has CONNECT, schema USAGE, table SELECT/INSERT/UPDATE/DELETE and
 sequence USAGE/SELECT, but owns no tables and has no migration DDL permission.

@@ -1,4 +1,4 @@
-# TSETMC Market Data — Milestone 3A
+# TSETMC Market Data — Milestone 3B-1
 
 Independent Python foundation for a TSETMC HTTP/JSON collector and the Go
 `ChartData` daily chart contract. Authorized pilot: **فولاد — فولاد مبارکه اصفهان**,
@@ -16,6 +16,18 @@ and scheduled maintenance require an explicit bounded operator window; no
 unattended service is installed or enabled. Durable remote synchronization, company
 FastAPI integration and production deployment are not implemented. Only فولاد is live;
 schema keys, ownership and reusable collectors already support multiple instruments.
+
+Milestone 3B-1 adds a **disabled-by-default local transactional outbox**: exact
+daily/revision/coverage publication, coalescible current/status heads, bounded
+source-only enrollment and explicitly simulated staging/receipt/ACK storage.
+Read the [source design](docs/milestone-3b1-design.md),
+[operations](docs/source-outbox-operations.md) and
+[verification](docs/milestone-3b1-verification.md). There is no HTTPS worker or
+company integration. Source code now expects schema `0004_outbox` (21 tables).
+The existing original pilot was not migrated or seeded; its last known head is
+0003_scheduling. **Do not apply these changes to that pilot without separate
+migration authorization.** The local database commands below are retained setup/
+operator references, not permission to upgrade or write to the protected pilot.
 
 ## Setup
 
