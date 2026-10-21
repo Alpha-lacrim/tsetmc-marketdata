@@ -20,8 +20,8 @@ import sqlalchemy as sa
 
 from tsetmc_marketdata.config import validate_ins_code
 from tsetmc_marketdata.storage import schema_v3b1 as p
-from tsetmc_marketdata.storage.config import DatabaseSettings, OwnershipError
-from tsetmc_marketdata.storage.database import Database
+from tsetmc_marketdata.storage.config import DatabaseSettings
+from tsetmc_marketdata.storage.database import Database, verify_schema
 from tsetmc_marketdata.storage.outbox import RecoveryFence, SourceOutbox
 from tsetmc_marketdata.storage.publication_wire import decode, encode, identity, validate
 from tsetmc_marketdata.storage.repository import Repository
@@ -126,6 +126,8 @@ class Worker:
             raise DeliveryError("transport_unavailable", retryable=True) from None
 
     async def fence(self, conn: Any) -> None:
+        if conn.closed or conn.invalidated or not conn.in_transaction():
+            raise RecoveryFence("delivery transaction is no longer active")
         row = (
             (
                 await conn.execute(
@@ -139,7 +141,7 @@ class Worker:
         live = await conn.scalar(
             sa.text(
                 "SELECT EXISTS(SELECT FROM pg_locks WHERE pid=:pid AND "
-                "locktype='advisory' AND classid=81484 AND objid=:key AND granted)"
+                "locktype='advisory' AND classid=81484 AND objid=:key AND objsubid=2 AND granted)"
             ),
             {"pid": row["backend_pid"], "key": self.lock_key},
         )
@@ -148,22 +150,22 @@ class Worker:
 
     @asynccontextmanager
     async def transaction(self) -> AsyncIterator[SourceOutbox]:
-        # Collector ownership is held only during short local transactions, never HTTPS.
-        async with self.db.owner(self.config.ins_code) as conn:
+        # The collector retains its session lock; only publication clocks are shared.
+        async with self.db.engine.connect() as conn, conn.begin():
+            await verify_schema(conn)
+            await self.fence(conn)
             repo = Repository(conn, self.config.ins_code)
-            async with repo.atomic():
-                await self.fence(conn)
-                conn.info["authenticated_delivery"] = True
-                box = SourceOutbox(repo)
-                await box.load()
-                assert box.dataset is not None
-                if (box.dataset["producer_id"], box.dataset["destination_id"]) != (
-                    self.config.producer_id,
-                    self.config.destination_id,
-                ):
-                    raise RecoveryFence("configured dataset binding mismatch")
-                yield box
-                await self.fence(conn)
+            box = SourceOutbox(repo, delivery_fence=lambda: self.fence(conn))
+            await box.load()
+            assert box.dataset is not None
+            if (box.dataset["producer_id"], box.dataset["destination_id"]) != (
+                self.config.producer_id,
+                self.config.destination_id,
+            ):
+                raise RecoveryFence("configured dataset binding mismatch")
+            await box.lock_clocks()
+            yield box
+            await self.fence(conn)
 
     async def save_state(self) -> None:
         async with self.transaction() as box:
@@ -205,15 +207,16 @@ class Worker:
                 await box.continuity(self.anchor)
             elif batches:
                 raise RecoveryFence("missing external anchor for existing delivery history")
-        target = self.config.anchor_file
-        target.parent.mkdir(parents=True, exist_ok=True)
-        temporary = target.with_suffix(".pending")
-        with temporary.open("wb") as file:
-            file.write(encode(proof))
-            file.flush()
-            os.fsync(file.fileno())
-        os.replace(temporary, target)
-        self.anchor = proof
+            # Keep takeover serialized through publication of the external proof.
+            target = self.config.anchor_file
+            target.parent.mkdir(parents=True, exist_ok=True)
+            temporary = target.with_suffix(".pending")
+            with temporary.open("wb") as file:
+                file.write(encode(proof))
+                file.flush()
+                os.fsync(file.fileno())
+            os.replace(temporary, target)
+            self.anchor = proof
 
     async def session(self) -> None:
         async with self.transaction() as box:
@@ -417,12 +420,10 @@ class Worker:
             )
             & 0x7FFFFFFF
         )
-        self.anchor = (
-            decode(self.config.anchor_file.read_bytes()) if self.config.anchor_file.exists() else {}
-        )
         delivered = 0
         try:
             async with self.db.engine.connect() as owner:
+                await verify_schema(owner)
                 acquired = await owner.scalar(
                     sa.text("SELECT pg_try_advisory_lock(81484,:key)"), {"key": self.lock_key}
                 )
@@ -462,19 +463,31 @@ class Worker:
                             session_id=str(self.config.session_id),
                             session_generation=self.config.session_generation,
                         )
+                    self.anchor = (
+                        decode(self.config.anchor_file.read_bytes())
+                        if self.config.anchor_file.exists()
+                        else {}
+                    )
                     await self.checkpoint()
                     # Existing ACKs are never trusted after a destination restore without receipts.
                     for batch_id in self.anchor["staged"]:
                         receipt = await self.request("GET", "/tsetmc/receipts/" + batch_id)
+                        async with self.transaction() as box:
+                            saved = await box.batch(UUID(batch_id))
                         if receipt is None:
-                            async with self.transaction() as box:
-                                saved = await box.batch(UUID(batch_id))
-                                if saved["phase"] != "staged":
-                                    raise RecoveryFence("company lost previously committed receipt")
-                        elif receipt.get("payload_sha256") != self.anchor["staged"][
-                            batch_id
-                        ] or receipt.get("destination_id") != str(self.config.destination_id):
-                            raise RecoveryFence("company continuity mismatch")
+                            if saved["phase"] != "staged":
+                                raise RecoveryFence("company lost previously committed receipt")
+                        else:
+                            validate(receipt, "Receipt")
+                            if (
+                                receipt["payload_sha256"] != self.anchor["staged"][batch_id]
+                                or receipt["destination_id"] != str(self.config.destination_id)
+                                or receipt["batch_id"] != batch_id
+                                or receipt["producer_id"] != str(self.config.producer_id)
+                                or saved["receipt"] is not None
+                                and saved["receipt"] != receipt
+                            ):
+                                raise RecoveryFence("company continuity mismatch")
                     deadline = asyncio.get_running_loop().time() + seconds
                     backoff = 2
                     while asyncio.get_running_loop().time() < deadline:
@@ -496,10 +509,6 @@ class Worker:
                                 await asyncio.sleep(
                                     min(5, max(0, deadline - asyncio.get_running_loop().time()))
                                 )
-                        except OwnershipError:
-                            await asyncio.sleep(
-                                min(2, max(0, deadline - asyncio.get_running_loop().time()))
-                            )
                         except DeliveryError as error:
                             if not error.retryable:
                                 raise
