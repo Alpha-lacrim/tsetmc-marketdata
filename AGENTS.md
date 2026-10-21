@@ -1,5 +1,12 @@
 # Repository instructions
 
+Current scope (2026-10-21): the owner explicitly requested the shared company API
+integration, collector synchronization, end-to-end verification and Git handling.
+That request supersedes the historical milestone restrictions below on implementing
+integration and publishing task branches. Preserve the original pilot and frozen
+releases. No unattended deployment or expanded live instruments were activated.
+Read HANDOFF.md and docs/company-delivery.md for the current implementation.
+
 Keep all work in this independent repository. Never modify TradingView projects,
 connect to their databases, use their volumes, or reuse their runtime configuration.
 Milestone 3A authorizes independent PostgreSQL 16.1 storage, additive migrations,

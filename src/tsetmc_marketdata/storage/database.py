@@ -16,7 +16,7 @@ from tsetmc_marketdata.storage.schema_v3a import metadata as scheduling_metadata
 from tsetmc_marketdata.storage.schema_v3b1 import metadata as publication_metadata
 
 LOCK_NAMESPACE = 81483
-SCHEMA_REVISION = "0004_outbox"
+SCHEMA_REVISION = "0005_delivery"
 
 
 def make_engine(settings: DatabaseSettings) -> AsyncEngine:

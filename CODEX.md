@@ -1,5 +1,12 @@
 # Working context
 
+Current scope (2026-10-21): the owner explicitly requested the shared company API
+integration, collector synchronization, end-to-end verification and Git handling.
+That request supersedes the historical milestone restrictions below on implementing
+integration and publishing task branches. Preserve the original pilot and frozen
+releases. No unattended deployment or expanded live instruments were activated.
+Read HANDOFF.md and docs/company-delivery.md for the current implementation.
+
 Read AGENTS.md and README.md. This is the independent TSETMC collector project,
 independent from Alpha-lacrim/tradingview-marketdata. The owner authorized public
 Milestone 1 baseline publication and the v0.1.0-milestone1 tag. Further publication,

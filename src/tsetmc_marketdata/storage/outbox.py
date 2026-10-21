@@ -959,8 +959,10 @@ class SourceOutbox:
         simulate: bool = False,
         limit: int = 100,
     ) -> bytes:
-        if not simulate or not 1 <= limit <= 100:
-            raise ValueError("only explicit bounded local simulation is implemented")
+        if (
+            not simulate and not self.conn.info.get("authenticated_delivery")
+        ) or not 1 <= limit <= 100:
+            raise ValueError("bounded simulation or fenced delivery context required")
         await self.load()
         assert self.dataset is not None
         prior = await self.conn.scalar(
@@ -1053,6 +1055,7 @@ class SourceOutbox:
                 payload_sha256=hashlib.sha256(body).hexdigest(),
                 after_position=after,
                 through_position=through,
+                simulated=simulate,
             )
         )
         return body
@@ -1077,9 +1080,11 @@ class SourceOutbox:
     async def receive(
         self, batch_id: UUID, receipt: dict[str, Any], *, simulate: bool = False
     ) -> None:
-        if not simulate:
-            raise ValueError("only explicitly simulated receipts are implemented")
+        if not simulate and not self.conn.info.get("authenticated_delivery"):
+            raise ValueError("simulation or fenced delivery context required")
         row = await self.batch(batch_id)
+        if row["simulated"] != simulate:
+            raise PublicationError("cannot mix simulated and authenticated delivery")
         request = decode(bytes(row["request_bytes"]))
         validate(receipt, "Receipt")
         for key in (
@@ -1134,9 +1139,11 @@ class SourceOutbox:
         )
 
     async def acknowledge(self, batch_id: UUID, *, simulate: bool = False) -> None:
-        if not simulate:
-            raise ValueError("only explicitly simulated acknowledgments are implemented")
+        if not simulate and not self.conn.info.get("authenticated_delivery"):
+            raise ValueError("simulation or fenced delivery context required")
         row = await self.batch(batch_id)
+        if row["simulated"] != simulate:
+            raise PublicationError("cannot mix simulated and authenticated delivery")
         if row["phase"] == "acknowledged":
             return
         if row["phase"] != "received":

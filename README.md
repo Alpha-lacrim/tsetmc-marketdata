@@ -1,4 +1,4 @@
-# TSETMC Market Data — Milestone 3B-1
+# TSETMC Market Data — independent collection and company delivery
 
 Independent Python foundation for a TSETMC HTTP/JSON collector and the Go
 `ChartData` daily chart contract. Authorized pilot: **فولاد — فولاد مبارکه اصفهان**,
@@ -13,8 +13,8 @@ Milestone 3A adds a disabled-by-default foreground scheduler, durable bounded
 catch-up, session expectations, health reporting and auditable daily confirmation.
 This is a development implementation, with no production-readiness claim. Polling
 and scheduled maintenance require an explicit bounded operator window; no
-unattended service is installed or enabled. Durable remote synchronization, company
-FastAPI integration and production deployment are not implemented. Only فولاد is live;
+unattended service is installed or enabled. Opt-in HTTPS synchronization to the shared company FastAPI is now implemented;
+production deployment and live delivery have not been qualified. Only فولاد is live;
 schema keys, ownership and reusable collectors already support multiple instruments.
 
 Milestone 3B-1 adds a **disabled-by-default local transactional outbox**: exact
@@ -22,8 +22,9 @@ daily/revision/coverage publication, coalescible current/status heads, bounded
 source-only enrollment and explicitly simulated staging/receipt/ACK storage.
 Read the [source design](docs/milestone-3b1-design.md),
 [operations](docs/source-outbox-operations.md) and
-[verification](docs/milestone-3b1-verification.md). There is no HTTPS worker or
-company integration. Source code now expects schema `0004_outbox` (21 tables).
+[verification](docs/milestone-3b1-verification.md). The subsequent integration adds a fenced HTTPS worker and company delivery.
+Read [company delivery](docs/company-delivery.md) for setup and recovery.
+Source code now expects schema `0005_delivery` (22 tables).
 The existing original pilot was not migrated or seeded; its last known head is
 0003_scheduling. **Do not apply these changes to that pilot without separate
 migration authorization.** The local database commands below are retained setup/
