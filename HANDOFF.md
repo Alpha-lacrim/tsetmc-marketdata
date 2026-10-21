@@ -34,5 +34,13 @@ worker, restarts without reupload, and rejects a changed acknowledged receipt.
 Local review validation:372 passed,5 skipped on a newly initialized PostgreSQL16.1
 cluster under ignored .local/delivery-review-20261021 (loopback56041). Skips: three
 opt-in live tests and two optional backup tests. The source pilot was untouched.
-Ruff/format and strict mypy passed. Follow-up targeted and remote CI checks are
-recorded when complete; no migration edits or live-provider qualification claimed.
+Ruff/format and strict mypy passed. Final targeted delivery checks:19 passed.
+Portable PostgreSQL dump/restore continuity checks:2 passed. The isolated test
+cluster was stopped cleanly after testing; no persistent pilot resources changed.
+
+PR #1 merged verified runtime9bee3ce in main5303516 after GitHub run39597489566
+passed all jobs: Windows and Ubuntu251 passed/126 skipped each; PostgreSQL114
+passed/2 optional backup skips. Local-only private captures account for the extra
+local passes; these are offline regressions, not new live-provider qualification.
+https://github.com/alpha-lacrim/tsetmc-marketdata/actions/runs/39597489566
+This final evidence update changes documentation only.
