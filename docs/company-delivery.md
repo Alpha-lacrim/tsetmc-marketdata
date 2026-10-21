@@ -3,9 +3,11 @@
 This source checkout adds migration `0005_delivery` and an explicitly activated
 HTTPS worker. It uses the existing `tsetmc.v1` contract. Acquisition remains an
 independent TSETMC process and database; no company DB password belongs here.
-The matching `tradingview-main-consolidation` checkout contains the company
+The matching `tradingview-marketdata` main branch contains the audited company
 receiver, schema `0011`, one READ application, and `docs/unified-dashboard-flow.md`
 with the complete installation sequence and frontend routes.
+Do not deploy the superseded company `codex/unified-dashboard-flow` branch: its
+alternate migration `0011` is incompatible with the audited main schema.
 
 The original persistent Foolad pilot was not migrated, enrolled, or written during
 this work. Tests use invented records in newly created PostgreSQL 16.1 databases.
@@ -38,8 +40,11 @@ Neither this integration nor the preceding live pilot proves all-market coverage
 
 ## Delivery and recovery
 
-One advisory-lock coordinator owns a producer. Short source transactions also use
-the existing instrument fence; HTTPS never holds that instrument lock. Exact
+One advisory-lock coordinator owns a producer. Delivery uses short transactions
+fenced by that coordinator and locks the instrument's publication clocks in the
+same order as collection. It does not acquire the collector's lifetime instrument
+lock, so collection and synchronization can run concurrently. HTTPS holds no SQL
+transaction or publication locks. Exact
 request bytes are stored before sending. The worker checks for an existing
 company receipt, validates and stores it, then acknowledges the source position.
 Daily and coverage records preserve order; current and status heads may coalesce.
@@ -52,7 +57,7 @@ lookup. Neither a retry nor a newer receipt makes an old price fresh.
 
 Keep the external continuity anchor outside database backups and preserve it on
 restart. A restored source behind that evidence, a lost company receipt, changed
-ownership, destination identity, epoch, or manifest stops delivery for review.
+ownership, destination identity, epoch, manifest, or changed saved receipt stops delivery for review.
 Do not reset cursors or invent new identities to bypass that stop. The company's
 stored REST and WebSocket data remain available during source outages.
 
@@ -61,7 +66,8 @@ stored REST and WebSocket data remain available during source outages.
 The worker uses the trusted local collector principal. A dedicated restricted
 SQL-function worker role is not implemented. Startup audits up to 10,000 retained
 batches; source budgets and this audit ceiling fail closed. No automatic pruning
-or company journal retention is supplied. Startup receipt audit time is additional
+is supplied here. Audited company main supplies bounded journal retention; configure
+its reconnect window separately. Startup receipt audit time is additional
 to the bounded delivery loop. Operators must qualify storage, restart duration,
 backup/restore and retention for their workload before unattended deployment.
 

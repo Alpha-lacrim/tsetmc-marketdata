@@ -1,6 +1,7 @@
 """No network: delivery configuration and transport trust boundaries."""
 
 import json
+from types import SimpleNamespace
 from uuid import uuid4
 
 import httpx
@@ -9,6 +10,8 @@ import pytest
 from tsetmc_marketdata.delivery import DeliveryConfig, DeliveryError, Worker
 from tsetmc_marketdata.storage.config import DatabaseSettings
 from tsetmc_marketdata.storage.database import Database
+from tsetmc_marketdata.storage.outbox import RecoveryFence, SourceOutbox
+from tsetmc_marketdata.storage.repository import Repository
 
 
 def config(tmp_path, **changes):
@@ -77,3 +80,34 @@ async def test_transport_classification_without_body_or_token_leaks(tmp_path, st
     finally:
         await worker.http.aclose()
         await db.aclose()
+
+
+@pytest.mark.parametrize("operation", ["stage", "receive", "acknowledge"])
+async def test_connection_info_does_not_authorize_delivery(operation):
+    connection = SimpleNamespace(info={"authenticated_delivery": True})
+    box = SourceOutbox(Repository(connection, "900000000000000001"))
+    with pytest.raises(ValueError, match="fenced delivery"):
+        if operation == "stage":
+            await box.stage(
+                "tsetmc_daily", batch_id=uuid4(), session_id=uuid4(), session_generation=1
+            )
+        elif operation == "receive":
+            await box.receive(uuid4(), {})
+        else:
+            await box.acknowledge(uuid4())
+
+
+@pytest.mark.parametrize(
+    "closed,invalidated,active", [(True, False, True), (False, True, True), (False, False, False)]
+)
+async def test_delivery_fence_rejects_ended_transaction(tmp_path, closed, invalidated, active):
+    worker = Worker(None, config(tmp_path))
+    try:
+        with pytest.raises(RecoveryFence, match="no longer active"):
+            await worker.fence(
+                SimpleNamespace(
+                    closed=closed, invalidated=invalidated, in_transaction=lambda: active
+                )
+            )
+    finally:
+        await worker.http.aclose()

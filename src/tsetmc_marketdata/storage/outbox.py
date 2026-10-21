@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Awaitable, Callable
 from datetime import UTC, date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid5
@@ -47,14 +48,13 @@ class RecoveryFence(PublicationError):
 
 
 class SourceOutbox:
-    """All mutations require an explicit Repository.atomic and its session fence.
+    """Collector publication or explicitly fenced delivery, serialized by stream clocks."""
 
-    Staging/receipt/ACK methods are LOCAL SIMULATION primitives. A future worker
-    needs its own coordinator/instrument fences and trusted network receipt path.
-    """
-
-    def __init__(self, repo: Repository) -> None:
+    def __init__(
+        self, repo: Repository, *, delivery_fence: Callable[[], Awaitable[None]] | None = None
+    ) -> None:
         self.repo, self.conn, self.code = repo, repo.conn, repo.ins_code
+        self.delivery_fence = delivery_fence
         self.dataset: dict[str, Any] | None = None
         self.clocks: dict[str, dict[str, Any]] = {}
         self.sources: dict[int, dict[str, Any]] = {}
@@ -74,7 +74,10 @@ class SourceOutbox:
         return sa.and_(*parts)
 
     async def load(self, *, required: bool = True) -> bool:
-        await fence(self.conn, self.code)
+        if self.delivery_fence is None:
+            await fence(self.conn, self.code)
+        else:
+            await self.delivery_fence()
         value = (
             (
                 await self.conn.execute(
@@ -959,10 +962,9 @@ class SourceOutbox:
         simulate: bool = False,
         limit: int = 100,
     ) -> bytes:
-        if (
-            not simulate and not self.conn.info.get("authenticated_delivery")
-        ) or not 1 <= limit <= 100:
+        if not 1 <= limit <= 100:
             raise ValueError("bounded simulation or fenced delivery context required")
+        await self.require_delivery(simulate)
         await self.load()
         assert self.dataset is not None
         prior = await self.conn.scalar(
@@ -1080,8 +1082,7 @@ class SourceOutbox:
     async def receive(
         self, batch_id: UUID, receipt: dict[str, Any], *, simulate: bool = False
     ) -> None:
-        if not simulate and not self.conn.info.get("authenticated_delivery"):
-            raise ValueError("simulation or fenced delivery context required")
+        await self.require_delivery(simulate)
         row = await self.batch(batch_id)
         if row["simulated"] != simulate:
             raise PublicationError("cannot mix simulated and authenticated delivery")
@@ -1139,8 +1140,7 @@ class SourceOutbox:
         )
 
     async def acknowledge(self, batch_id: UUID, *, simulate: bool = False) -> None:
-        if not simulate and not self.conn.info.get("authenticated_delivery"):
-            raise ValueError("simulation or fenced delivery context required")
+        await self.require_delivery(simulate)
         row = await self.batch(batch_id)
         if row["simulated"] != simulate:
             raise PublicationError("cannot mix simulated and authenticated delivery")
@@ -1190,6 +1190,12 @@ class SourceOutbox:
             .where(self.scope(p.batches), p.batches.c.batch_id == batch_id)
             .values(phase="acknowledged")
         )
+
+    async def require_delivery(self, simulate: bool) -> None:
+        if not simulate:
+            if self.delivery_fence is None:
+                raise ValueError("simulation or fenced delivery context required")
+            await self.delivery_fence()
 
     async def continuity(self, proof: dict[str, Any]) -> None:
         """Compare externally supplied proof only; anchor storage/auth is Stage 4."""
