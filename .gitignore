@@ -15,6 +15,11 @@ output/
 *.egg-info/
 # Local audit backups, genuine source captures and derived qualification evidence.
 .local/
+# Generated navigation remains available locally; it is not release source.
+/graphify-out/
+LOCAL_WORKSPACE.md
+.codex/*
+!.codex/hooks.json
 # Private local conversation and handoff notes, preserved outside the public baseline.
 /TSECMC_ConvHistory/
 /docs/evidence/

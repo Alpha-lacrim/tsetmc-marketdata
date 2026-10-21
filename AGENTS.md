@@ -1,56 +1,51 @@
 # Repository instructions
 
-Current scope (2026-10-21): the owner explicitly requested the shared company API
-integration, collector synchronization, end-to-end verification and Git handling.
-That request supersedes the historical milestone restrictions below on implementing
-integration and publishing task branches. Preserve the original pilot and frozen
-releases. No unattended deployment or expanded live instruments were activated.
-Read HANDOFF.md and docs/company-delivery.md for the current implementation.
+## Current scope and boundaries
 
-Keep all work in this independent repository. Never modify TradingView projects,
-connect to their databases, use their volumes, or reuse their runtime configuration.
-Milestone 3A authorizes independent PostgreSQL 16.1 storage, additive migrations,
-and explicitly activated, bounded foreground scheduling here only. No installed
-service, auto-start policy or unattended deployment is authorized. Session inference
-must remain UNKNOWN without qualified evidence; explicit operator windows require
-provenance. Preserve source uncertainty and the default finalized export selection.
-Only insCode `46348559193224090` (فولاد) may be enabled or fetched live. Reusable
-storage and collection code must scope ownership, keys and provenance by instrument;
-use invented identities for isolation tests. Do not implement synchronization,
-company FastAPI integration, deployment or additional live instruments.
-Do not commit, push, tag, or release without additional explicit authorization.
-Preserve commit 87690cb1f03f2b3deecb122c58eb48c06dff4e06 and v0.1.0-milestone1.
-Preserve published Milestone 2 commit 01a827be39bb48864d0b76c8e952f176a4904556.
-Do not edit applied migration files or frozen schema metadata; add a new revision.
+This independent repository implements TSETMC collection, PostgreSQL storage and
+opt-in HTTPS synchronization to the shared company API. The owner authorized
+integration, review fixes, Git checkpoints and workspace cleanup. No unattended
+service or expanded live coverage has been activated.
 
-Milestone 3B-1 authorizes source-only transactional publication and local simulated
-staging/receipt/ACK primitives, additive 0004_outbox, tests and documentation.
-The original persistent pilot is read-only: no migration, enrollment, seed,
-write-oriented smoke test or backup/restore there. All write tests must first
-verify a newly isolated disposable PostgreSQL 16.1 endpoint. Do not start unrelated
-Docker resources. Live delivery, worker/producer coordination, company changes,
-credentials and collection remain unauthorized in this task. The owner subsequently
-authorized committing and pushing the reviewed Milestone 3B-1 changes directly to
-main; no tag, release or deployment is authorized.
-Read docs/milestone-3b1-design.md and docs/source-outbox-operations.md.
+Read CODEX.md, HANDOFF.md, relevant source/tests and Git status before substantive
+work. Preserve unrelated changes. Detailed operations belong in docs/; HANDOFF.md
+records current state, not policy. Historical milestone instructions are archived
+under docs/history/ and do not override current authorization.
 
-Use Python 3.12+, async httpx, Decimal source measurements, aware instants, and
-Gregorian trading dates. Preserve raw payloads. Never conflate pDrCotVal and pClosing,
-or ChartData g (volume) and h (value). Tests must run offline; live probes are opt-in,
-paced, read-only, and bounded. Label fixture provenance honestly.
-Genuine captures under docs/evidence/ and audit backups under .local/ are private
-local artifacts, excluded from Git and distributions. Do not force-stage them.
-Public examples must be synthetic and clearly labeled. No software license has
-been selected by the owner; do not add one without instruction.
+## Data and ownership invariants
 
-Run `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy`, and
-`uv run pytest` after changes. Follow the conventions documented in docs/.
-PostgreSQL tests are opt-in with --postgres and use unique disposable
-tsetmc_test_<hex> databases. Never delete a persistent database or Docker volume.
-Collector startup must verify the schema, never migrate implicitly. Keep secrets,
-database backups and live exports under ignored .local/ or output/ only.
+- Only insCode `46348559193224090` (فولاد) is approved for live collection. Use invented
+  instruments for isolation tests; do not expand live instruments without authorization.
+- Preserve raw payloads and source uncertainty. Use Decimal for source measurements,
+  aware UTC instants and Gregorian trading dates. Never conflate last trade and
+  official close, or ChartData volume and value. Default exports select finalized data.
+- Scope storage, locks, keys and provenance by instrument. Keep collector and delivery
+  ownership fences intact; HTTPS must hold no SQL transaction or publication lock.
+- Use Python3.12+, async httpx and additive migrations. Do not edit applied migrations
+  or frozen schema metadata. Startup verifies the schema; it never migrates implicitly.
+- Preserve the original persistent Foolad pilot as read-only. Do not migrate, enroll,
+  seed, restore into or test-write that pilot. Never delete a persistent DB or volume.
+- Keep TradingView databases, volumes, runtime settings and credentials independent.
+  Company DB credentials do not belong on the source worker.
+- Never commit secrets, genuine captures or database backups. Keep those in ignored
+  `.local/`, `output/` or `docs/evidence/`. Public examples must be clearly synthetic.
+- Preserve published milestones, including v0.1.0-milestone1 and commits
+  87690cb1f03f2b3deecb122c58eb48c06dff4e06 and 01a827be39bb48864d0b76c8e952f176a4904556.
+  No software license has been selected; do not add one without instruction.
+
+## Validation and handoff
+
+Run `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy` and
+`uv run pytest` for relevant changes. Tests are offline by default. PostgreSQL
+checks use `--postgres` and uniquely created `tsetmc_test_<hex>` databases on a
+positively identified disposable endpoint. Live probes are explicit, paced,
+read-only and bounded. Do not claim a check passed unless it actually ran.
+
+Update HANDOFF.md and affected docs before ending meaningful work. Keep current
+instructions concise and move obsolete context to docs/history/.
 
 ## graphify
+
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 

@@ -1,5 +1,8 @@
 # TSETMC Market Data — independent collection and company delivery
 
+Start with [company delivery](docs/company-delivery.md), [current state](HANDOFF.md)
+and [workspace/checkpoint notes](docs/workspace.md). Use the `main` branch.
+
 Independent Python foundation for a TSETMC HTTP/JSON collector and the Go
 `ChartData` daily chart contract. Authorized pilot: **فولاد — فولاد مبارکه اصفهان**,
 `insCode` **`46348559193224090`** (a string).

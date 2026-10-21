@@ -14,8 +14,9 @@ Read `docs/company-delivery.md` and its linked company setup guide first.
 Validation uses synthetic records and isolated PostgreSQL 16.1, never the pilot.
 The earlier company unified-dashboard-verification report describes the superseded
 company branch; use current company HANDOFF.md for audited-main qualification.
-No company service, live delivery,
-unattended collection, tag or release was activated.
+No company service, live delivery or unattended collection was activated.
+Recovery checkpoint tags were added during the later workspace cleanup; they
+are not deployments or package releases.
 
 Next: deploy matching commits to an approved staging company/source database,
 configure real TLS and company login/BFF, and qualify the exact source registry.
@@ -43,4 +44,25 @@ passed all jobs: Windows and Ubuntu251 passed/126 skipped each; PostgreSQL114
 passed/2 optional backup skips. Local-only private captures account for the extra
 local passes; these are offline regressions, not new live-provider qualification.
 https://github.com/alpha-lacrim/tsetmc-marketdata/actions/runs/39597489566
-This final evidence update changes documentation only.
+## Workspace cleanup
+
+The active folder remains on `main`. Both repositories preserve annotated
+`checkpoint/unified-dashboard-2026-10-21` tags for the verified implementation
+and `checkpoint/workspace-clean-2026-10-21` for the organized workspace.
+Merged delivery/integration task branches were removed; commits remain in main.
+No runtime, migrations, dependency locks or published milestones changed.
+
+Conversation files moved into ignored `.local/notes/conversation-history/`.
+Previous build outputs were archived externally; `LOCAL_WORKSPACE.md` records
+private recovery locations. `.local/`, exports, captures, backups and the original
+pilot remain intact. Historical agent context is in `docs/history/`; current
+rules and procedures are concise in AGENTS.md and CODEX.md. The graph hook now
+uses PATH instead of an operator-specific executable path. Generated navigation
+and caches remain local. See `docs/workspace.md`.
+
+Cleanup validation: pytest **258 passed / 119 skipped**, Ruff, formatting and
+strict mypy passed. No database/live rerun was needed for this documentation and
+configuration cleanup; prior database evidence above covers the unchanged runtime.
+`graphify update .` refreshed local navigation; SQL graph extraction is unavailable
+in the installed tool. Both repositories' archived ZIPs passed CRC checks; moved
+source files were verified by SHA256. No persistent database or volume was changed.
