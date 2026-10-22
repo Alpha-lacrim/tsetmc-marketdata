@@ -30,3 +30,20 @@ The original pilot, old database/outbox pipeline, migrations and frozen releases
 are untouched. Native installation starts fresh; it does not import old databases.
 Old README and handoff are archived in docs/history/; their deployment requirements
 are historical. Existing workspace/checkpoint recovery remains in LOCAL_WORKSPACE.md.
+
+## Recovery hardening
+
+Native upload retries now show HTTP/transport causes, pending filenames, retry
+delays and recovery. Backoff doubles from 30 to 300 seconds and honors longer
+numeric or HTTP-date Retry-After. Malformed/non-object receipts and permanent
+rejections retain the file and fail visibly. Shared helper matches company copy.
+Staged uploads drain before source identity qualification; temporary network,
+DNS, timeout and server errors during qualification retry at 60..300 seconds.
+Invalid identities/access denials remain fatal. Source polling errors report
+category and HTTP status; one-shot failures still exit unsuccessfully.
+
+Ruff/format, strict mypy and full suite passed: 281 passed / 119 skipped.
+New regressions cover HTTP-date backoff, exact replay bytes, malformed receipts,
+permanent rejection, cancellation retention and startup identity recovery.
+Company integration also verified native DB outage/recovery. No schema/pilot,
+source permissions or live provider behavior changed; restart to load updates.

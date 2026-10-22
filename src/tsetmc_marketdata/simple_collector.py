@@ -80,6 +80,28 @@ async def collect_current(client: TSETMCClient) -> list[dict[str, Any]]:
     ]
 
 
+async def qualify(source: TSETMCClient, *, once: bool) -> Any:
+    delay = 60.0
+    while True:
+        try:
+            instrument, _ = await fetch_instrument(source, PILOT_INS_CODE)
+            return instrument
+        except TSETMCError as error:
+            if once or error.kind not in {
+                ErrorKind.NETWORK,
+                ErrorKind.DNS,
+                ErrorKind.TIMEOUT,
+                ErrorKind.SERVER,
+            }:
+                raise
+            print(
+                f"identity lookup: {error.kind.value} HTTP={error.status}; retry in {delay:g}s",
+                flush=True,
+            )
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, 300)
+
+
 async def run(args: argparse.Namespace) -> None:
     headers = (
         {"Authorization": "Bearer " + os.environ["SIMPLE_UPLOAD_TOKEN"]}
@@ -90,8 +112,10 @@ async def run(args: argparse.Namespace) -> None:
         TSETMCClient(Settings.from_env()) as source,
         httpx.AsyncClient(timeout=30, headers=headers, trust_env=False) as http,
     ):
-        # Identity qualification is shared with the existing collector.
-        instrument, _ = await fetch_instrument(source, PILOT_INS_CODE)
+        # Previously qualified durable uploads can drain even if the source is offline.
+        for kind in ("history", "latest"):
+            await PendingUpload(args.api_url, args.state_dir / (kind + ".json"), http).drain()
+        instrument = await qualify(source, once=args.once)
         print(f"Collecting {instrument.symbol} ({PILOT_INS_CODE})", flush=True)
 
         async def loop(kind: str, seconds: float) -> None:
@@ -110,10 +134,11 @@ async def run(args: argparse.Namespace) -> None:
                         flush=True,
                     )
                 except TSETMCError as error:
-                    if args.once:
+                    if args.once or error.kind == ErrorKind.ACCESS_DENIED:
                         raise
                     print(
-                        f"{kind}: provider failure ({type(error).__name__}); retrying", flush=True
+                        f"{kind}: {error.kind.value} HTTP={error.status}; retry in {seconds:g}s",
+                        flush=True,
                     )
                 if args.once:
                     return

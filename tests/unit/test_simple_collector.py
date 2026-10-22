@@ -136,3 +136,40 @@ async def test_one_shot_provider_failure_does_not_report_success(monkeypatch, tm
     with pytest.raises(ExceptionGroup) as caught:
         await collector.run(args)
     assert all(isinstance(error, SourceDataError) for error in caught.value.exceptions)
+
+
+@pytest.mark.parametrize(
+    "kind,once,retries",
+    [
+        ("network_failure", False, True),
+        ("timeout", False, True),
+        ("access_denied", False, False),
+        ("invalid_record", False, False),
+        ("network_failure", True, False),
+    ],
+)
+async def test_initial_identity_lookup_retries_only_transient_failures(
+    monkeypatch, kind, once, retries
+):
+    from tsetmc_marketdata.errors import ErrorKind, TransportError
+
+    attempts, sleeps = [], []
+
+    async def fetch(*args):
+        attempts.append(1)
+        if len(attempts) == 1:
+            raise TransportError(ErrorKind(kind), "synthetic failure")
+        return SimpleNamespace(symbol="synthetic"), None
+
+    async def sleep(delay):
+        sleeps.append(delay)
+
+    monkeypatch.setattr(collector, "fetch_instrument", fetch)
+    monkeypatch.setattr(collector.asyncio, "sleep", sleep)
+    if retries:
+        assert (await collector.qualify(None, once=once)).symbol == "synthetic"
+        assert sleeps == [60]
+    else:
+        with pytest.raises(TransportError):
+            await collector.qualify(None, once=once)
+        assert sleeps == []

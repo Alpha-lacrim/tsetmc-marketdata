@@ -3,18 +3,34 @@
 import asyncio
 import hashlib
 import json
+import math
 import os
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 from uuid import uuid4
 
 import httpx
+
+
+def retry_delay(value: str | None, minimum: float) -> float:
+    """Honor Retry-After seconds or HTTP dates, never retry sooner than requested."""
+    if not value:
+        return minimum
+    try:
+        seconds = float(value)
+    except ValueError:
+        try:
+            seconds = (parsedate_to_datetime(value) - datetime.now(UTC)).total_seconds()
+        except (TypeError, ValueError, OverflowError):
+            return minimum
+    return max(minimum, seconds) if math.isfinite(seconds) else minimum
 
 
 def json_value(value: Any) -> str:
@@ -108,9 +124,13 @@ class PendingUpload:
             self.endpoint + "/api/ingest", content=raw, headers={"Content-Type": "application/json"}
         )
         response.raise_for_status()
-        receipt = response.json()
+        try:
+            receipt = response.json()
+        except ValueError:
+            raise ValueError("API receipt is not JSON; pending file retained") from None
         if (
-            receipt.get("batch_id") != batch["batch_id"]
+            not isinstance(receipt, dict)
+            or receipt.get("batch_id") != batch["batch_id"]
             or receipt.get("sha256") != hashlib.sha256(raw).hexdigest()
             or type(receipt.get("accepted")) is not int
             or receipt.get("accepted") != len(batch["observations"])
@@ -120,21 +140,34 @@ class PendingUpload:
         sync_directory(self.path.parent)
 
     async def drain(self) -> None:
+        backoff = 30.0
+        failures = 0
         while self.path.exists():
-            delay = 30.0
+            delay = backoff
             try:
                 await self.flush()
             except httpx.HTTPStatusError as error:
-                if error.response.status_code not in {408, 429, 500, 502, 503, 504}:
+                status = error.response.status_code
+                if status not in {408, 429} and not 500 <= status <= 599:
                     raise ValueError(
-                        f"API rejected upload ({error.response.status_code}); file retained"
+                        f"API rejected upload (HTTP {status}); file retained at {self.path}"
                     ) from None
-                try:
-                    delay = max(delay, float(error.response.headers.get("retry-after", "30")))
-                except ValueError:
-                    pass
-            except httpx.TransportError:
-                pass
-            if self.path.exists():
-                print("API unavailable; pending upload preserved, retrying.", flush=True)
-                await asyncio.sleep(min(delay, 3600))
+                reason = f"HTTP {status}"
+                delay = retry_delay(error.response.headers.get("retry-after"), backoff)
+            except httpx.TransportError as error:
+                reason = type(error).__name__
+            else:
+                if failures:
+                    print(
+                        f"API recovered; pending upload acknowledged ({self.path.name}).",
+                        flush=True,
+                    )
+                return
+            failures += 1
+            print(
+                f"API unavailable ({reason}); pending {self.path.name} preserved; "
+                f"retry {failures} in {delay:g}s.",
+                flush=True,
+            )
+            await asyncio.sleep(delay)
+            backoff = min(backoff * 2, 300)

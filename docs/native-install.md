@@ -58,3 +58,30 @@ Existing PostgreSQL collection/outbox/delivery commands remain available for old
 installations. Their databases and the original pilot are preserved; the new API
 does not automatically import their archived data. See [company-delivery.md](company-delivery.md)
 only if continuing that older architecture.
+
+## Failure handling and troubleshooting
+
+Uploads retain the exact pending batch until a matching receipt arrives. Transient
+network errors, HTTP 408/429 and server 5xx responses retry after 30 seconds,
+doubling up to five minutes. A longer numeric or HTTP-date Retry-After is honored.
+Logs identify the failure type/status, pending filename, retry delay and recovery.
+Do not delete pending files. Bad receipts and permanent upload rejections stop
+rather than silently discarding data; check the API URL/token/schema and restart
+with the same state directory after resolving the cause.
+
+If the API stops responding on Windows, press Esc in its terminal to clear any
+console text selection, then check /health and /openapi.json. Selection can block
+console output; it is not the only possible cause of a hang. HTTP access logging
+is off by default to reduce terminal output; enable `marketdata-simple serve
+--access-log` when diagnosing requests. Startup and error logs remain enabled.
+Database pool waits are bounded at five seconds and native database operations at
+20 seconds. Handled database/network/timeouts return HTTP 503 with Retry-After: 30.
+An unresponsive process/network can still time out without returning JSON.
+WebSockets close with code 1013 on temporary database failures; reconnect with
+the last processed cursor. These changes do not alter the chart response format.
+
+TSETMC drains already staged uploads before its startup identity lookup. Temporary
+network/DNS/timeout/server lookup failures retry at 60 seconds, increasing to five
+minutes. Invalid identities and access denials stop; they are never bypassed.
+Normal polling reports the error category and status instead of only an exception
+class. `--once` continues to exit unsuccessfully on source failures.
