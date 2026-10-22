@@ -20,6 +20,7 @@ dependencies = [
 
 [project.scripts]
 tsetmc-marketdata = "tsetmc_marketdata.cli:main"
+tsetmc-simple = "tsetmc_marketdata.simple_collector:main"
 
 [dependency-groups]
 dev = ["pytest>=8.3,<9", "pytest-asyncio>=1,<2", "pytest-socket>=0.7,<1", "ruff>=0.12,<1", "mypy>=1.16,<2", "types-jsonschema>=4.23,<5"]

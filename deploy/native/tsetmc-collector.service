@@ -1,0 +1,15 @@
+[Unit]
+Description=TSETMC native collector
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/marketdata/tsetmc-marketdata
+EnvironmentFile=%h/marketdata/collector.env
+ExecStart=%h/marketdata/tsetmc-marketdata/.venv/bin/tsetmc-simple --state-dir %h/.local/share/marketdata/tsetmc
+Restart=on-failure
+RestartSec=60
+TimeoutStopSec=40
+
+[Install]
+WantedBy=default.target

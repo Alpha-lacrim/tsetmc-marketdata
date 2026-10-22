@@ -1,5 +1,11 @@
 # Engineering procedure
 
+For the current native installation use `docs/native-install.md` and
+`simple_collector.py`/`simple_delivery.py`. It needs no source database, migrations
+or worker credential provisioning. The older database/outbox procedures below
+remain for existing installations and archives only. HTTP and open company access
+are explicitly authorized; preserve source semantics and durable upload retries.
+
 Read AGENTS.md and HANDOFF.md first, then the relevant code, callers, tests and
 configuration. Inspect Git status and preserve unrelated local changes. Prefer the
 smallest cohesive change that fixes the observed behavior; avoid unrelated refactors.

@@ -2,6 +2,12 @@
 
 ## Current scope and boundaries
 
+The owner now selected native direct HTTP collection with no local PostgreSQL:
+`tsetmc-simple` and `docs/native-install.md` are the default for new installations.
+HTTP and an optional upload token are authorized. Durable retry files replace the
+source DB for this path. Keep the old database pipeline and original pilot intact;
+its fencing rules below still apply when that legacy path is used.
+
 This independent repository implements TSETMC collection, PostgreSQL storage and
 opt-in HTTPS synchronization to the shared company API. The owner authorized
 integration, review fixes, Git checkpoints and workspace cleanup. No unattended

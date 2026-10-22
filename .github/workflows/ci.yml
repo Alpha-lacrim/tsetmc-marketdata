@@ -1,6 +1,7 @@
 name: Offline verification
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -28,6 +29,8 @@ jobs:
       - run: uv run --offline pytest
 
   postgres:
+    # Retained for legacy source-DB compatibility; direct HTTP mode needs no Docker.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
