@@ -21,10 +21,39 @@ export COMPANY_API_URL='http://SERVER:8000'
 uv run --no-sync tsetmc-simple
 ```
 
-The command verifies Foolad's identity, polls current data every 15 seconds and
-refreshes available daily history hourly. The default insCode is
-`46348559193224090`. This does not expand live coverage beyond the qualified pilot.
-Use `--poll-seconds`, `--history-seconds`, `--state-dir` or `--once` as needed.
+The default discovers primary ordinary shares from TSETMC market watch at startup
+(745 candidates in the 22 October 2026 capture), then verifies each instrument's
+metadata before collecting its native daily history and current observation.
+It excludes rights, options, funds and secondary trading lines from discovery.
+This is broad share coverage, not every product or a guaranteed complete listing.
+Restart to rediscover newly listed instruments. Foolad is processed first when present.
+
+Requests share one paced HTTP client (one request start per second by default).
+Latest-price sweeps run sequentially, followed by a 15-second pause. With hundreds
+of instruments a sweep takes minutes, longer during initial qualification/backfill
+or source failures; `--poll-seconds 15` does NOT mean every share updates in 15 seconds.
+For a faster small watchlist, repeat `--ins-code`:
+
+```bash
+uv run tsetmc-simple --ins-code 46348559193224090 --ins-code 41379697187196382
+```
+
+Full history refreshes per instrument every 86,400 seconds by default, preserving
+old corrections. `history-completed.json` records success only after all batches
+are acknowledged, so a restart does not redownload completed histories. Never delete
+pending files. Retain the checkpoint with the same company database; after an intentional
+company database reset, archive the state directory and start a new one. The checkpoint
+is bound to the API URL but cannot detect a database reset behind that same URL.
+`--once` forces a full pass regardless of history checkpoints and reports any failed
+instrument as failure after attempting the remaining instruments in that stream.
+Use `--history-seconds 3600` for hourly full history if that source load is acceptable.
+Metadata names are sent to the company API. Source IDs remain the storage keys.
+
+Malformed data skips that instrument for the current cycle, with a visible error;
+other instruments continue. Access denials and permanent upload failures still stop.
+No source price is derived from the abbreviated bulk market-watch fields: the observed
+bulk response lacks a usable date and contains zero-valued placeholder price fields.
+See [coverage and live checks](instrument-expansion.md).
 
 Keep `.local/simple-tsetmc/` across restarts. A pending upload is retried before
 new observations for that stream; malformed/conflicting history is reported and
@@ -82,7 +111,7 @@ the last processed cursor. These changes do not alter the chart response format.
 
 TSETMC drains already staged uploads before its startup identity lookup. Temporary
 network/DNS/timeout/server lookup failures retry at 60 seconds, increasing to five
-minutes. Invalid identities and access denials stop; they are never bypassed.
+minutes. Invalid instrument identities skip that instrument; access denials stop and are never bypassed.
 Normal polling reports the error category and status instead of only an exception
 class. `--once` continues to exit unsuccessfully on source failures.
 

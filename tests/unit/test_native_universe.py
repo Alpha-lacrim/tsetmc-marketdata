@@ -1,0 +1,123 @@
+"""Broad native collection keeps identities isolated and resumes acknowledged history."""
+
+import asyncio
+import hashlib
+import json
+from datetime import UTC, datetime
+from types import SimpleNamespace
+
+import httpx
+import pytest
+
+from tsetmc_marketdata import simple_collector as collector
+from tsetmc_marketdata.errors import ErrorKind, SourceDataError
+from tsetmc_marketdata.providers.universe import share_codes
+
+
+def test_discovery_excludes_options_rights_and_secondary_lines():
+    def row(code, kind=300, instrument="IRO1TEST0001"):
+        return dict(insCode=code, yVal=kind, insID=instrument)
+
+    assert share_codes(
+        {
+            "marketwatch": [
+                row("123"),
+                row("456", 303, "IRO3TEST0001"),
+                row("789", 311, "IRO9TEST0001"),
+                row("100", 400, "IRR1TEST0101"),
+                row("101", 300, "IRO1TEST0003"),
+            ]
+        }
+    ) == ["123", "456"]
+    for payload in (
+        {},
+        {"marketwatch": []},
+        {"marketwatch": [row(False)]},
+        {"marketwatch": [row("123"), row("123")]},
+        {"marketwatch": [row("0")]},
+    ):
+        with pytest.raises(SourceDataError):
+            share_codes(payload)
+
+
+@pytest.mark.parametrize("bad_history", [False, True])
+async def test_two_instruments_delivery_failure_isolation_and_restart(
+    monkeypatch, tmp_path, bad_history
+):
+    class Source:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            pass
+
+    calls, uploads = [], []
+
+    async def instrument(source, code):
+        return SimpleNamespace(
+            symbol="synthetic " + code,
+            company_name="Synthetic",
+            instrument_id="test-" + code,
+            isin=None,
+        ), None
+
+    async def history(source, code):
+        calls.append(code)
+        if bad_history and code == "123":
+            raise SourceDataError(ErrorKind.INVALID_RECORD, "synthetic malformed history")
+        return [dict(symbol=code, interval="1d", received_at=datetime.now(UTC), metadata={})]
+
+    async def current(source, code):
+        return [dict(symbol=code, interval="quote", received_at=datetime.now(UTC), metadata={})]
+
+    def respond(request):
+        data = json.loads(request.content)
+        uploads.extend(data["observations"])
+        return httpx.Response(
+            200,
+            json=dict(
+                batch_id=data["batch_id"],
+                sha256=hashlib.sha256(request.content).hexdigest(),
+                accepted=len(data["observations"]),
+            ),
+        )
+
+    original_client = httpx.AsyncClient
+    monkeypatch.setattr(collector, "TSETMCClient", lambda settings: Source())
+    monkeypatch.setattr(
+        collector.httpx,
+        "AsyncClient",
+        lambda **kw: original_client(transport=httpx.MockTransport(respond), **kw),
+    )
+    monkeypatch.setattr(collector, "fetch_instrument", instrument)
+    monkeypatch.setattr(collector, "collect_history", history)
+    monkeypatch.setattr(collector, "collect_current", current)
+    args = SimpleNamespace(
+        api_url="http://company",
+        state_dir=tmp_path,
+        once=True,
+        history_seconds=86400,
+        poll_seconds=15,
+        ins_code=["123", "456"],
+    )
+    if bad_history:
+        with pytest.raises(ExceptionGroup):
+            await collector.run(args)
+    else:
+        await collector.run(args)
+    assert calls == ["123", "456"]
+    assert any(r["symbol"] == "456" and r["interval"] == "1d" for r in uploads)
+    assert all(r["metadata"]["display_name"] == "synthetic " + r["symbol"] for r in uploads)
+    saved = json.loads((tmp_path / "history-completed.json").read_text())
+    assert set(saved["completed"]) == ({"456"} if bad_history else {"123", "456"})
+    assert not (tmp_path / "history.json").exists()
+    if not bad_history:
+        calls.clear()
+        args.once = False
+
+        async def stop_after_cycle(seconds):
+            raise asyncio.CancelledError
+
+        monkeypatch.setattr(collector.asyncio, "sleep", stop_after_cycle)
+        await collector.run(args)
+        assert calls == []  # Acknowledged full histories are not redownloaded after restart.

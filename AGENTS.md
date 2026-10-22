@@ -11,7 +11,7 @@ its fencing rules below still apply when that legacy path is used.
 This independent repository implements TSETMC collection, PostgreSQL storage and
 opt-in HTTPS synchronization to the shared company API. The owner authorized
 integration, review fixes, Git checkpoints and workspace cleanup. No unattended
-service or expanded live coverage has been activated.
+service has been activated. Expanded native share collection is authorized.
 
 Read CODEX.md, HANDOFF.md, relevant source/tests and Git status before substantive
 work. Preserve unrelated changes. Detailed operations belong in docs/; HANDOFF.md
@@ -20,8 +20,10 @@ under docs/history/ and do not override current authorization.
 
 ## Data and ownership invariants
 
-- Only insCode `46348559193224090` (فولاد) is approved for live collection. Use invented
-  instruments for isolation tests; do not expand live instruments without authorization.
+- Native collection may discover primary ordinary shares and collect explicitly selected
+  insCodes under the owner's expansion authorization. Qualify each source identity;
+  do not merge secondary lines, rights, funds, options or futures into ordinary shares.
+  Legacy CLI pilot fences and the original Foolad database remain intact.
 - Preserve raw payloads and source uncertainty. Use Decimal for source measurements,
   aware UTC instants and Gregorian trading dates. Never conflate last trade and
   official close, or ChartData volume and value. Default exports select finalized data.

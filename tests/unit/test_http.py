@@ -251,12 +251,12 @@ async def test_endpoint_services(history_payload, current_payload, instrument_pa
     assert instrument.symbol == "فولاد" and daily.trade_count == 1234
 
 
-async def test_pilot_restriction_and_invalid_path():
+async def test_invalid_instrument_and_path():
     async with TSETMCClient(
         settings(), transport=httpx.MockTransport(lambda r: httpx.Response(200))
     ) as client:
         with pytest.raises(ValueError):
-            await fetch_history(client, "123")
+            await fetch_history(client, "../123")
         with pytest.raises(ValueError):
             await client.get_json("https://other.test/secret")
         with pytest.raises(ValueError):

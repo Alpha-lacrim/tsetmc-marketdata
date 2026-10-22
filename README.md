@@ -13,10 +13,12 @@ export COMPANY_API_URL='http://SERVER:8000'
 uv run --no-sync tsetmc-simple
 ```
 
-The collector verifies Foolad (`46348559193224090`), polls current observations
-every 15 seconds and available daily history hourly. Two pending-upload files
-preserve interrupted HTTP transfers. Keep `.local/simple-tsetmc/` across restarts.
-Use `--once`, `--poll-seconds`, `--history-seconds` and `--state-dir` as needed.
+The default discovers primary ordinary shares (745 candidates in the latest check),
+verifies each identity and collects daily history plus timestamped latest prices.
+Use repeated `--ins-code` arguments for a smaller, faster watchlist. Full history
+refreshes daily; current sweeps are paced and take minutes across hundreds of shares.
+Two pending-upload files and a history checkpoint survive restarts. Keep
+`.local/simple-tsetmc/`. Read the installation guide for freshness and recovery limits.
 
 The dashboard reads from the **same company API** as international markets:
 
