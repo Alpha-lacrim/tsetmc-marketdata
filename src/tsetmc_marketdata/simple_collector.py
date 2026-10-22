@@ -113,6 +113,27 @@ async def qualify(source: TSETMCClient, ins_code: str = PILOT_INS_CODE, *, once:
             delay = min(delay * 2, 300)
 
 
+async def discover(source: TSETMCClient, *, once: bool) -> list[str]:
+    delay = 60.0
+    while True:
+        try:
+            return await discover_shares(source)
+        except TSETMCError as error:
+            if once or error.kind not in {
+                ErrorKind.NETWORK,
+                ErrorKind.DNS,
+                ErrorKind.TIMEOUT,
+                ErrorKind.SERVER,
+                ErrorKind.NOT_FOUND,
+            }:
+                raise
+            # An empty/no-match discovery is not proof that all shares disappeared.
+            # Do not start with an empty universe or relax product/identity checks.
+            print(f"discovery: {error.kind.value}: {error}; retry in {delay:g}s", flush=True)
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, 300)
+
+
 async def run(args: argparse.Namespace) -> None:
     headers = (
         {"Authorization": "Bearer " + os.environ["SIMPLE_UPLOAD_TOKEN"]}
@@ -128,25 +149,10 @@ async def run(args: argparse.Namespace) -> None:
             await PendingUpload(args.api_url, args.state_dir / (kind + ".json"), http).drain()
         codes = getattr(args, "ins_code", None)
         if not codes and getattr(args, "all_shares", False):
-            delay = 60.0
-            while True:
-                try:
-                    codes = await discover_shares(source)
-                    if PILOT_INS_CODE in codes:
-                        codes.remove(PILOT_INS_CODE)
-                        codes.insert(0, PILOT_INS_CODE)
-                    break
-                except TSETMCError as error:
-                    if args.once or error.kind not in {
-                        ErrorKind.NETWORK,
-                        ErrorKind.DNS,
-                        ErrorKind.TIMEOUT,
-                        ErrorKind.SERVER,
-                    }:
-                        raise
-                    print(f"discovery: {error.kind.value}; retry in {delay:g}s", flush=True)
-                    await asyncio.sleep(delay)
-                    delay = min(delay * 2, 300)
+            codes = await discover(source, once=args.once)
+            if PILOT_INS_CODE in codes:
+                codes.remove(PILOT_INS_CODE)
+                codes.insert(0, PILOT_INS_CODE)
         codes = list(dict.fromkeys(codes or [PILOT_INS_CODE]))
         print(f"Collecting {len(codes)} instruments; requests share source pacing", flush=True)
         instruments: dict[str, Any] = {}

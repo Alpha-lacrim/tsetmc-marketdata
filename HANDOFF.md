@@ -61,3 +61,15 @@ with retained state directories. No DB reset/migration. No employer host was sup
 or deployment performed. Monitor full-history fill, errors, pending files, source
 freshness and company disk growth. Read LOCAL_WORKSPACE.md/docs/workspace.md before
 workspace cleanup; preserve archived original data.
+
+
+## Discovery startup recovery fix
+
+User observed no-primary-shares at startup. A fresh paced read-only probe returned
+3,462 market-watch rows and 745 selected IDs; the failing response itself was not
+available, so its upstream cause is unconfirmed. Normal discovery now retries
+NOT_FOUND (empty/no-match list) alongside transient transport/server errors, with
+60..300s backoff and row-count diagnostics. Schemas, identities and access gates are
+unchanged; --once still fails immediately. Tests cover repeated emptiness/recovery,
+backoff cap and fatal schema/identity/access errors. Full suite311 passed/119 skipped,
+Ruff/mypy passed. No DB or retry files changed; rerun the same collector command.

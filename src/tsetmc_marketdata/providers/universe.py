@@ -36,7 +36,9 @@ def share_codes(payload: dict[str, Any]) -> list[str]:
             raise SourceDataError(ErrorKind.INVALID_RECORD, "zero or duplicate discovery insCode")
         selected[code] = instrument_id
     if not selected:
-        raise SourceDataError(ErrorKind.NOT_FOUND, "no primary shares discovered")
+        raise SourceDataError(
+            ErrorKind.NOT_FOUND, f"no primary shares discovered from {len(rows)} marketwatch rows"
+        )
     return sorted(selected)
 
 

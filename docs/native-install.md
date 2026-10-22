@@ -122,3 +122,11 @@ Foolad endpoint comparisons and validation changes. Current responses can carry
 an older source date even when polling succeeds. The source clock is not a
 verified last-trade timestamp. Keep machine clocks synchronized: source event
 times more than five minutes ahead of receipt are rejected by local policy.
+
+
+Discovery recovery: an empty/no-match market-watch response now logs the number
+of rows received and retries after 60, 120, 240, then 300 seconds (capped). It does
+not start an empty universe or loosen identity/product filters. Malformed schemas,
+invalid identities and access denials still fail visibly. `--once` fails immediately
+on unsuccessful discovery. The reported no-share response was not captured; a later
+bounded probe returned 3,462 rows and 745 accepted share IDs. Its cause is unconfirmed.

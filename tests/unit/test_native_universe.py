@@ -121,3 +121,45 @@ async def test_two_instruments_delivery_failure_isolation_and_restart(
         monkeypatch.setattr(collector.asyncio, "sleep", stop_after_cycle)
         await collector.run(args)
         assert calls == []  # Acknowledged full histories are not redownloaded after restart.
+
+
+async def test_empty_discovery_recovers_with_bounded_backoff(monkeypatch, capsys):
+    attempts, sleeps = [], []
+
+    async def fetch(source):
+        attempts.append(1)
+        if len(attempts) < 5:
+            return share_codes({"marketwatch": []})
+        return ["123", "456"]
+
+    async def sleep(seconds):
+        sleeps.append(seconds)
+
+    monkeypatch.setattr(collector, "discover_shares", fetch)
+    monkeypatch.setattr(collector.asyncio, "sleep", sleep)
+    assert await collector.discover(None, once=False) == ["123", "456"]
+    assert sleeps == [60, 120, 240, 300]
+    assert "0 marketwatch rows" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    "kind,once",
+    [
+        (ErrorKind.NOT_FOUND, True),
+        (ErrorKind.SCHEMA, False),
+        (ErrorKind.INVALID_RECORD, False),
+        (ErrorKind.ACCESS_DENIED, False),
+    ],
+)
+async def test_discovery_does_not_hide_invalid_source_or_one_shot_failure(monkeypatch, kind, once):
+    async def fetch(source):
+        raise SourceDataError(kind, "synthetic failure")
+
+    async def sleep(seconds):
+        pytest.fail("unexpected retry")
+
+    monkeypatch.setattr(collector, "discover_shares", fetch)
+    monkeypatch.setattr(collector.asyncio, "sleep", sleep)
+    with pytest.raises(SourceDataError) as caught:
+        await collector.discover(None, once=once)
+    assert caught.value.kind == kind
