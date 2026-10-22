@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, time
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Any
 
@@ -57,6 +57,11 @@ class CurrentPrice:
                 value.tzinfo is None or value.utcoffset() != UTC.utcoffset(value)
             ):
                 raise RecordError(f"{name} must be timezone-aware UTC")
+
+        # Local integrity policy, not a provider latency guarantee.
+        if self.received_at is not None and self.source_reported_at is not None:
+            if self.source_reported_at > self.received_at + timedelta(minutes=5):
+                raise RecordError("source clock exceeds receive time by more than five minutes")
 
     @property
     def last_trade_change(self) -> PriceChange:

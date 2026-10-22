@@ -250,3 +250,50 @@ def test_lossless_decoder_rejects_invalid_json(body):
 def test_lossless_json_numeric_values():
     p = loads_source('{"price":0.10000000000000000001,"n":9007199254740993}')
     assert p["price"] == Decimal("0.10000000000000000001") and p["n"] == 9007199254740993
+
+
+@pytest.mark.parametrize("key", ["insCode", "dEven", "hEven"])
+@pytest.mark.parametrize("value", [False, Decimal("0"), 0.0])
+def test_current_placeholder_requires_exact_source_type(current_payload, key, value):
+    current_payload["closingPriceInfo"][key] = value
+    with pytest.raises(RecordError):
+        parse_current(current_payload, CODE, received_at=None)
+
+
+@pytest.mark.parametrize("field", ["instrument", "instrumentState"])
+@pytest.mark.parametrize("nested", [{"insCode": "99"}, {"insCode": False}, [], "wrong"])
+def test_current_rejects_conflicting_or_malformed_nested_identity(current_payload, field, nested):
+    current_payload["closingPriceInfo"][field] = nested
+    with pytest.raises(RecordError):
+        parse_current(current_payload, CODE, received_at=None)
+
+
+@pytest.mark.parametrize("nested", [None, {"insCode": "0"}, {"insCode": CODE}])
+def test_current_accepts_observed_or_matching_nested_identity(current_payload, nested):
+    current_payload["closingPriceInfo"]["instrument"] = nested
+    assert parse_current(current_payload, CODE, received_at=None).ins_code == CODE
+
+
+def test_empty_daily_measurements_quarantined_but_zero_activity_preserved():
+    raw = {"insCode": CODE, "dEven": 20260321, "pClosing": None}
+    result = parse_history({"closingPriceDaily": [raw]}, CODE)
+    assert not result.records and result.has_errors
+    raw["zTotTran"] = 0
+    assert parse_daily(raw, CODE).trade_count == 0
+
+
+def test_source_clock_future_guard_and_stale_observation(current_payload):
+    from datetime import timedelta
+
+    q = parse_current(current_payload, CODE, received_at=None)
+    with pytest.raises(RecordError, match="source clock"):
+        parse_current(
+            current_payload, CODE, received_at=q.source_reported_at - timedelta(minutes=6)
+        )
+    assert parse_current(
+        current_payload, CODE, received_at=q.source_reported_at - timedelta(minutes=5)
+    )
+    stale = parse_current(
+        current_payload, CODE, received_at=q.source_reported_at + timedelta(days=5)
+    )
+    assert stale.source_reported_at == q.source_reported_at

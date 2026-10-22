@@ -70,11 +70,16 @@ def count_field(raw: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def is_placeholder(value: object) -> bool:
+    # bool is an int subclass and False == 0; it is never a source identity/clock.
+    return value is None or type(value) is int and value == 0 or type(value) is str and value == "0"
+
+
 def identity(raw: dict[str, Any], expected: str, *, allow_placeholder: bool) -> None:
     validate_ins_code(expected)
     value = raw.get("insCode")
     # Published current-price examples use '0'; bind those to the requested endpoint.
-    if allow_placeholder and value in (None, "0", 0):
+    if allow_placeholder and is_placeholder(value):
         return
     if isinstance(value, bool) or not isinstance(value, (str, int)) or str(value) != expected:
         raise RecordError("source insCode does not match requested instrument")
@@ -209,17 +214,17 @@ def parse_current(payload: object, ins_code: str, *, received_at: datetime | Non
         raise SourceDataError(ErrorKind.SCHEMA, "closingPriceInfo must contain price measurements")
     identity(raw, ins_code, allow_placeholder=True)
     diagnostics: list[str] = []
-    if raw.get("insCode") in (None, "0", 0):
+    if is_placeholder(raw.get("insCode")):
         diagnostics.append("identity bound to requested endpoint; source insCode absent/zero")
     day = None
     clock = None
     reported_at = None
-    if raw.get("dEven") not in (None, 0, "0"):
+    if not is_placeholder(raw.get("dEven")):
         try:
             day = parse_source_date(raw["dEven"])
         except ValueError as exc:
             raise RecordError("invalid current dEven") from exc
-    if raw.get("hEven") not in (None, 0, "0"):
+    if not is_placeholder(raw.get("hEven")):
         try:
             clock = parse_source_time(raw["hEven"])
         except ValueError as exc:
@@ -235,6 +240,11 @@ def parse_current(payload: object, ins_code: str, *, received_at: datetime | Non
     if not isinstance(state, dict):
         raise RecordError("instrumentState must be an object or null")
     identity(state, ins_code, allow_placeholder=True)
+    instrument = raw.get("instrument")
+    if instrument is not None:
+        if not isinstance(instrument, dict):
+            raise RecordError("instrument must be an object or null")
+        identity(instrument, ins_code, allow_placeholder=True)
     values = {name: decimal_field(raw, key) for name, key in MEASUREMENTS.items()}
     count = count_field(raw)
     return CurrentPrice(

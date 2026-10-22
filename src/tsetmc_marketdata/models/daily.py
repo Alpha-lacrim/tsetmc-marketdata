@@ -25,6 +25,8 @@ def validate_measurements(values: dict[str, Decimal | None], trade_count: int | 
             not isinstance(value, Decimal) or not value.is_finite() or value < 0
         ):
             raise RecordError(f"{name} must be a finite nonnegative Decimal or null")
+    if trade_count is None and all(value is None for value in values.values()):
+        raise RecordError("record contains no observed measurements")
     high, low = values["high"], values["low"]
     if high is not None and low is not None:
         if high < low:

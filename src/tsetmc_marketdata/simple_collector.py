@@ -73,6 +73,11 @@ async def collect_current(client: TSETMCClient) -> list[dict[str, Any]]:
             metadata={
                 "raw": current.raw,
                 "diagnostics": current.diagnostics,
+                "instrument_state": current.instrument_state,
+                "instrument_state_title": current.instrument_state_title,
+                "timestamp_semantics": (
+                    "source-reported Tehran dEven/hEven; not verified last-trade time"
+                ),
                 "source_date": str(current.source_date) if current.source_date else None,
                 "source_time": str(current.source_time) if current.source_time else None,
             },

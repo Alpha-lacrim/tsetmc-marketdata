@@ -85,3 +85,11 @@ network/DNS/timeout/server lookup failures retry at 60 seconds, increasing to fi
 minutes. Invalid identities and access denials stop; they are never bypassed.
 Normal polling reports the error category and status instead of only an exception
 class. `--once` continues to exit unsuccessfully on source failures.
+
+## Source validation
+
+See [the 2026-10-22 behavior review](validation-review-2026-10-22.md) for live
+Foolad endpoint comparisons and validation changes. Current responses can carry
+an older source date even when polling succeeds. The source clock is not a
+verified last-trade timestamp. Keep machine clocks synchronized: source event
+times more than five minutes ahead of receipt are rejected by local policy.
