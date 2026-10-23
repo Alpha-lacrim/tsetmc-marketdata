@@ -21,16 +21,22 @@ export COMPANY_API_URL='http://SERVER:8000'
 uv run --no-sync tsetmc-simple
 ```
 
-The default discovers primary ordinary shares from TSETMC market watch at startup
-(745 candidates in the 22 October 2026 capture), then verifies each instrument's
-metadata before collecting its native daily history and current observation.
-It excludes rights, options, funds and secondary trading lines from discovery.
-This is broad share coverage, not every product or a guaranteed complete listing.
-Restart to rediscover newly listed instruments. Foolad is processed first when present.
+The default loads a **fixed top-100 watchlist bundled with the installed package**.
+It does not call market watch during startup, so an empty market-watch response
+cannot block normal collection. The selection uses reported traded value for primary
+ordinary shares in a captured TSETMC snapshot, with Foolad included. It is a dated
+liquidity shortlist, not an official index, market-cap ranking or investment advice.
+See [the named list and endpoint checks](top100.md).
+
+Run `uv run tsetmc-simple --state-dir .local/laptop-test-tsetmc` on the existing
+laptop. Stop the previous copy first. **Remove `--all-shares` from the old command.**
+Keep the same state directory and company database. Explicit `--ins-code` values
+still select a smaller watchlist. `--all-shares` is optional live discovery of the
+broader primary-share universe; its empty-response retry behavior remains available.
 
 Requests share one paced HTTP client (one request start per second by default).
-Latest-price sweeps run sequentially, followed by a 15-second pause. With hundreds
-of instruments a sweep takes minutes, longer during initial qualification/backfill
+Latest-price sweeps run sequentially, followed by a 15-second pause. With 100
+instruments a sweep takes at least about 100 seconds and usually longer, longer during initial qualification/backfill
 or source failures; `--poll-seconds 15` does NOT mean every share updates in 15 seconds.
 For a faster small watchlist, repeat `--ins-code`:
 

@@ -8,9 +8,9 @@ migrations, archives and frozen releases are unchanged. Legacy CLI pilot fences 
 
 ## Current instrument scope
 
-Owner authorized broad native collection. Default startup discovers primary ordinary
-shares from ClosingPrice/GetMarketWatch; --ins-code (repeatable) restricts to selected
-IDs. Latest capture: 3,462 rows, 745 eligible primary-share candidates using yVal
+Owner authorized a fixed top100 default after repeated empty market-watch responses.
+Default startup loads packaged data/top100.json without discovery. --all-shares opts
+into the former broad mode; --ins-code (repeatable) selects explicit IDs. Latest capture: 3,462 rows, 745 eligible primary-share candidates using yVal
 300/303/309/313 and IRO[1357][A-Z0-9]{4}0001. Other products and secondary lines are
 excluded, not merged. IDs are validated/deduplicated and metadata is qualified per
 instrument. Original special Foolad identity checks still hold. Restart rediscovers
@@ -28,7 +28,7 @@ recorded in docs/validation-review-2026-10-22.md and its ignored captures.
 
 One shared paced source client, independent history/latest loops, sequential visits
 per stream. One request start/second default: a 745-share latest sweep takes at least
-about12.5 minutes, more with metadata/history/failures. --poll-seconds is the pause
+about12.5 minutes; the fixed100 takes at least100 seconds, more with metadata/history/failures. --poll-seconds is the pause
 AFTER a sweep. Use a small explicit watchlist for better freshness. Do not claim
 real-time/source finality, native minutes or invent clocks from receipt times.
 
@@ -73,3 +73,9 @@ NOT_FOUND (empty/no-match list) alongside transient transport/server errors, wit
 unchanged; --once still fails immediately. Tests cover repeated emptiness/recovery,
 backoff cap and fatal schema/identity/access errors. Full suite311 passed/119 skipped,
 Ruff/mypy passed. No DB or retry files changed; rerun the same collector command.
+
+## Fixed top100 default completed
+
+Packaged data/top100.json loads through importlib.resources independent of working directory. Default never calls market watch; --all-shares is explicit opt-in. 314 tests passed/119 skipped, Ruff/mypy and offline wheel build passed. Wheel verified to include100 IDs. Tests cover default delivery without discovery. See docs/top100.md for list and qualifications.
+
+Verification: 96 of100 instruments passed metadata identity, current-price and five-row recent-history checks. Four timed out twice: 66416853783916493, 28431095903407567, 46752599569017089, 60350996279289099. They remain selected from the genuine ranking but are not live-qualified; the collector retries their metadata on later cycles. No prices were uploaded during these probes. Full historical completeness and continuous availability were not established.

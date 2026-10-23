@@ -13,12 +13,12 @@ export COMPANY_API_URL='http://SERVER:8000'
 uv run --no-sync tsetmc-simple
 ```
 
-The default discovers primary ordinary shares (745 candidates in the latest check),
-verifies each identity and collects daily history plus timestamped latest prices.
-Use repeated `--ins-code` arguments for a smaller, faster watchlist. Full history
-refreshes daily; current sweeps are paced and take minutes across hundreds of shares.
-Two pending-upload files and a history checkpoint survive restarts. Keep
-`.local/simple-tsetmc/`. Read the installation guide for freshness and recovery limits.
+The default uses a [fixed top-100 primary-share list](docs/top100.md), bundled with
+the package and independent of market-watch discovery. Remove `--all-shares` from
+older commands to use this list. Each ID is still qualified before collecting prices.
+Use repeated `--ins-code` arguments for a smaller watchlist. Full history refreshes
+daily; current sweeps are paced and take minutes across 100 shares. Preserve
+`.local/simple-tsetmc/` or your selected `--state-dir` across restarts.
 
 The dashboard reads from the **same company API** as international markets:
 

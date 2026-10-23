@@ -15,7 +15,7 @@ from tsetmc_marketdata.errors import ErrorKind, SourceDataError, TSETMCError
 from tsetmc_marketdata.providers.closing_prices import fetch_current, fetch_history
 from tsetmc_marketdata.providers.http_client import TSETMCClient
 from tsetmc_marketdata.providers.instruments import fetch_instrument
-from tsetmc_marketdata.providers.universe import discover_shares
+from tsetmc_marketdata.providers.universe import discover_shares, top_share_codes
 from tsetmc_marketdata.simple_delivery import PendingUpload, single_instance, sync_directory
 from tsetmc_marketdata.utils.dates import daily_unix_seconds
 
@@ -150,10 +150,10 @@ async def run(args: argparse.Namespace) -> None:
         codes = getattr(args, "ins_code", None)
         if not codes and getattr(args, "all_shares", False):
             codes = await discover(source, once=args.once)
-            if PILOT_INS_CODE in codes:
-                codes.remove(PILOT_INS_CODE)
-                codes.insert(0, PILOT_INS_CODE)
-        codes = list(dict.fromkeys(codes or [PILOT_INS_CODE]))
+        codes = list(dict.fromkeys(codes or top_share_codes()))
+        if PILOT_INS_CODE in codes:
+            codes.remove(PILOT_INS_CODE)
+            codes.insert(0, PILOT_INS_CODE)
         print(f"Collecting {len(codes)} instruments; requests share source pacing", flush=True)
         instruments: dict[str, Any] = {}
         identity_lock = asyncio.Lock()
@@ -263,13 +263,12 @@ def main() -> None:
     parser.add_argument(
         "--all-shares",
         action="store_true",
-        help="discover primary shares (default when no --ins-code is given)",
+        help="opt in to live discovery instead of the fixed top100 watchlist",
     )
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
     if args.all_shares and args.ins_code:
         parser.error("choose --all-shares or explicit --ins-code values")
-    args.all_shares = not args.ins_code
     if not 5 <= args.poll_seconds <= 86400 or not 60 <= args.history_seconds <= 86400:
         parser.error("poll-seconds must be 5..86400; history-seconds must be 60..86400")
     with single_instance(args.state_dir):

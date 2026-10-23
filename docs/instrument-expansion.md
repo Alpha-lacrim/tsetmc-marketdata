@@ -1,7 +1,10 @@
-# Broad native share collection
+# Optional broad native share collection
+
+The default is now the [fixed top100 watchlist](top100.md). The broader mode below
+requires `--all-shares` and is not needed for normal startup.
 
 The owner authorized expansion on 22 October 2026. `tsetmc-simple` now discovers
-primary ordinary shares by default. `--ins-code CODE` (repeatable) selects explicit
+primary ordinary shares when `--all-shares` is selected. `--ins-code CODE` (repeatable) selects explicit
 IDs instead. Legacy command pilot restrictions and original pilot databases remain.
 
 Discovery reads https://cdn.tsetmc.com/api/ClosingPrice/GetMarketWatch through the

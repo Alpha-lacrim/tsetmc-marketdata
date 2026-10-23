@@ -1,11 +1,24 @@
 """Discover primary ordinary-share IDs; market-watch prices are not ingestion input."""
 
+import json
 import re
+from importlib.resources import files
 from typing import Any
 
 from tsetmc_marketdata.config import validate_ins_code
 from tsetmc_marketdata.errors import ErrorKind, SourceDataError
 from tsetmc_marketdata.providers.http_client import TSETMCClient
+
+
+def top_share_codes() -> list[str]:
+    """Packaged fixed watchlist: startup never depends on the market-watch snapshot."""
+    manifest = json.loads(
+        files("tsetmc_marketdata").joinpath("data/top100.json").read_text(encoding="utf-8")
+    )
+    codes = [validate_ins_code(row["ins_code"]) for row in manifest["instruments"]]
+    if len(codes) != 100 or len(set(codes)) != 100 or "0" in codes:
+        raise ValueError("packaged top100 watchlist must contain 100 distinct nonzero IDs")
+    return codes
 
 
 def share_codes(payload: dict[str, Any]) -> list[str]:

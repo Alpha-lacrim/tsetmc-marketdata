@@ -128,6 +128,7 @@ async def test_one_shot_provider_failure_does_not_report_success(monkeypatch, tm
     monkeypatch.setattr(collector, "collect_current", failed)
     args = SimpleNamespace(
         api_url="http://localhost:8000",
+        ins_code=[PILOT_INS_CODE],
         state_dir=tmp_path,
         once=True,
         history_seconds=60,

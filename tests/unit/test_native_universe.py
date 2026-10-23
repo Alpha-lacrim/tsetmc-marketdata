@@ -11,7 +11,7 @@ import pytest
 
 from tsetmc_marketdata import simple_collector as collector
 from tsetmc_marketdata.errors import ErrorKind, SourceDataError
-from tsetmc_marketdata.providers.universe import share_codes
+from tsetmc_marketdata.providers.universe import share_codes, top_share_codes
 
 
 def test_discovery_excludes_options_rights_and_secondary_lines():
@@ -40,9 +40,10 @@ def test_discovery_excludes_options_rights_and_secondary_lines():
             share_codes(payload)
 
 
+@pytest.mark.parametrize("default_watchlist", [False, True])
 @pytest.mark.parametrize("bad_history", [False, True])
 async def test_two_instruments_delivery_failure_isolation_and_restart(
-    monkeypatch, tmp_path, bad_history
+    monkeypatch, tmp_path, bad_history, default_watchlist
 ):
     class Source:
         async def __aenter__(self):
@@ -98,8 +99,15 @@ async def test_two_instruments_delivery_failure_isolation_and_restart(
         once=True,
         history_seconds=86400,
         poll_seconds=15,
-        ins_code=["123", "456"],
+        ins_code=None if default_watchlist else ["123", "456"],
+        all_shares=False,
     )
+    monkeypatch.setattr(collector, "top_share_codes", lambda: ["123", "456"])
+
+    async def forbidden_discovery(source):
+        pytest.fail("fixed watchlist must not call market watch")
+
+    monkeypatch.setattr(collector, "discover_shares", forbidden_discovery)
     if bad_history:
         with pytest.raises(ExceptionGroup):
             await collector.run(args)
@@ -163,3 +171,11 @@ async def test_discovery_does_not_hide_invalid_source_or_one_shot_failure(monkey
     with pytest.raises(SourceDataError) as caught:
         await collector.discover(None, once=once)
     assert caught.value.kind == kind
+
+
+def test_packaged_top100_is_unique_and_independent_of_working_directory(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    codes = top_share_codes()
+    assert len(codes) == len(set(codes)) == 100
+    assert "46348559193224090" in codes
+    assert all(code.isascii() and code.isdigit() and code != "0" for code in codes)

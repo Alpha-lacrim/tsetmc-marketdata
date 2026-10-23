@@ -1,0 +1,707 @@
+{
+  "selection": "Top 100 primary ordinary shares by reported market-watch traded value (qtc); not an official index or market-cap ranking",
+  "captured_at": "2026-10-22T18:31:23.951191+00:00",
+  "ranking_input": "live",
+  "instruments": [
+    {
+      "ins_code": "46348559193224090",
+      "symbol": "فولاد",
+      "company_name": "فولاد مباركه اصفهان",
+      "instrument_id": "IRO1FOLD0001",
+      "rank": 1
+    },
+    {
+      "ins_code": "58931793851445922",
+      "symbol": "ومعادن",
+      "company_name": "توسعه‌معادن‌وفلزات‌",
+      "instrument_id": "IRO1MADN0001",
+      "rank": 2
+    },
+    {
+      "ins_code": "778253364357513",
+      "symbol": "وبملت",
+      "company_name": "بانك ملت",
+      "instrument_id": "IRO1BMLT0001",
+      "rank": 3
+    },
+    {
+      "ins_code": "23293437377896568",
+      "symbol": "تاصيكو",
+      "company_name": "سرمايه گذاري صدرتامين",
+      "instrument_id": "IRO1SADR0001",
+      "rank": 4
+    },
+    {
+      "ins_code": "26824673819862694",
+      "symbol": "خبهمن",
+      "company_name": "گروه‌بهمن‌",
+      "instrument_id": "IRO1BHMN0001",
+      "rank": 5
+    },
+    {
+      "ins_code": "30714151942396396",
+      "symbol": "تابان",
+      "company_name": "گروه پتروشيمي تابان فردا",
+      "instrument_id": "IRO1TBAN0001",
+      "rank": 6
+    },
+    {
+      "ins_code": "35425587644337450",
+      "symbol": "فملي",
+      "company_name": "ملي‌ صنايع‌ مس‌ ايران‌",
+      "instrument_id": "IRO1MSMI0001",
+      "rank": 7
+    },
+    {
+      "ins_code": "25244329144808274",
+      "symbol": "فارس",
+      "company_name": "صنايع پتروشيمي خليج فارس",
+      "instrument_id": "IRO1PKLJ0001",
+      "rank": 8
+    },
+    {
+      "ins_code": "63917421733088077",
+      "symbol": "وتجارت",
+      "company_name": "بانك تجارت",
+      "instrument_id": "IRO1BTEJ0001",
+      "rank": 9
+    },
+    {
+      "ins_code": "65883838195688438",
+      "symbol": "خودرو",
+      "company_name": "ايران‌ خودرو",
+      "instrument_id": "IRO1IKCO0001",
+      "rank": 10
+    },
+    {
+      "ins_code": "30199365830132996",
+      "symbol": "سيمكات",
+      "company_name": "سيم و كابل تبريز",
+      "instrument_id": "IRO3SIMC0001",
+      "rank": 11
+    },
+    {
+      "ins_code": "47026464823464687",
+      "symbol": "ومهان",
+      "company_name": "گروه توسعه مالي مهرآيندگان",
+      "instrument_id": "IRO1MEAZ0001",
+      "rank": 12
+    },
+    {
+      "ins_code": "22560050433388046",
+      "symbol": "تاپيكو",
+      "company_name": "س. نفت و گاز و پتروشيمي تأمين",
+      "instrument_id": "IRO1PTAP0001",
+      "rank": 13
+    },
+    {
+      "ins_code": "4942127026063388",
+      "symbol": "كاما",
+      "company_name": "باما",
+      "instrument_id": "IRO1BAMA0001",
+      "rank": 14
+    },
+    {
+      "ins_code": "24696953498398744",
+      "symbol": "شگستر",
+      "company_name": "گسترش سوخت سبززاگرس(سهامي عام)",
+      "instrument_id": "IRO1SHGS0001",
+      "rank": 15
+    },
+    {
+      "ins_code": "18027801615184692",
+      "symbol": "كچاد",
+      "company_name": "معدني‌وصنعتي‌چادرملو",
+      "instrument_id": "IRO1CHML0001",
+      "rank": 16
+    },
+    {
+      "ins_code": "20562694899904339",
+      "symbol": "شپديس",
+      "company_name": "پتروشيمي پرديس",
+      "instrument_id": "IRO1PRDZ0001",
+      "rank": 17
+    },
+    {
+      "ins_code": "44891482026867833",
+      "symbol": "خساپا",
+      "company_name": "سايپا",
+      "instrument_id": "IRO1SIPA0001",
+      "rank": 18
+    },
+    {
+      "ins_code": "33938004134399485",
+      "symbol": "صبا",
+      "company_name": "گروه مالي صبا تامين",
+      "instrument_id": "IRO1STIZ0001",
+      "rank": 19
+    },
+    {
+      "ins_code": "8175784894140974",
+      "symbol": "فزر",
+      "company_name": "پويا زركان آق دره",
+      "instrument_id": "IRO3PZAZ0001",
+      "rank": 20
+    },
+    {
+      "ins_code": "35700344742885862",
+      "symbol": "كگل",
+      "company_name": "معدني و صنعتي گل گهر",
+      "instrument_id": "IRO1GOLG0001",
+      "rank": 21
+    },
+    {
+      "ins_code": "52232388263291380",
+      "symbol": "واميد",
+      "company_name": "گروه مديريت سرمايه گذاري اميد",
+      "instrument_id": "IRO1OIMC0001",
+      "rank": 22
+    },
+    {
+      "ins_code": "43450146028916610",
+      "symbol": "دزاگرس",
+      "company_name": "دارويي و نهاده هاي زاگرس دارو",
+      "instrument_id": "IRO3ZGDZ0001",
+      "rank": 23
+    },
+    {
+      "ins_code": "33293588228706998",
+      "symbol": "وپارس",
+      "company_name": "بانك‌پارسيان‌",
+      "instrument_id": "IRO1BPAR0001",
+      "rank": 24
+    },
+    {
+      "ins_code": "19040514831923530",
+      "symbol": "نوري",
+      "company_name": "پتروشيمي نوري",
+      "instrument_id": "IRO1NORI0001",
+      "rank": 25
+    },
+    {
+      "ins_code": "47302318535715632",
+      "symbol": "ونوين",
+      "company_name": "بانك‌اقتصادنوين‌",
+      "instrument_id": "IRO1NOVN0001",
+      "rank": 26
+    },
+    {
+      "ins_code": "22667016906590506",
+      "symbol": "شبهرن",
+      "company_name": "نفت‌ بهران‌",
+      "instrument_id": "IRO1NBEH0001",
+      "rank": 27
+    },
+    {
+      "ins_code": "28320293733348826",
+      "symbol": "وبصادر",
+      "company_name": "بانك صادرات ايران",
+      "instrument_id": "IRO1BSDR0001",
+      "rank": 28
+    },
+    {
+      "ins_code": "71483646978964608",
+      "symbol": "ذوب",
+      "company_name": "ذوب آهن اصفهان",
+      "instrument_id": "IRO1ZOBI0001",
+      "rank": 29
+    },
+    {
+      "ins_code": "26014913469567886",
+      "symbol": "وغدير",
+      "company_name": "سرمايه‌گذاري‌غدير(هلدينگ‌",
+      "instrument_id": "IRO1GDIR0001",
+      "rank": 30
+    },
+    {
+      "ins_code": "49188729526980541",
+      "symbol": "شسپا",
+      "company_name": "نفت سپاهان",
+      "instrument_id": "IRO1SEPP0001",
+      "rank": 31
+    },
+    {
+      "ins_code": "50247622569476338",
+      "symbol": "بوعلي",
+      "company_name": "پتروشيمي بوعلي سينا",
+      "instrument_id": "IRO1BONA0001",
+      "rank": 32
+    },
+    {
+      "ins_code": "5866848234665627",
+      "symbol": "دسبحان",
+      "company_name": "سبحان دارو",
+      "instrument_id": "IRO1DSBH0001",
+      "rank": 33
+    },
+    {
+      "ins_code": "35026822153186010",
+      "symbol": "فنقره",
+      "company_name": "ذوب گران رنگين فلز",
+      "instrument_id": "IRO3NGRE0001",
+      "rank": 34
+    },
+    {
+      "ins_code": "27922860956133067",
+      "symbol": "مبين",
+      "company_name": "مبين انرژي خليج فارس",
+      "instrument_id": "IRO1MOBN0001",
+      "rank": 35
+    },
+    {
+      "ins_code": "28864540805361867",
+      "symbol": "فخوز",
+      "company_name": "فولاد  خوزستان",
+      "instrument_id": "IRO1FKHZ0001",
+      "rank": 36
+    },
+    {
+      "ins_code": "40611478183231802",
+      "symbol": "شدوص",
+      "company_name": "دوده‌ صنعتي‌ پارس‌",
+      "instrument_id": "IRO1DODE0001",
+      "rank": 37
+    },
+    {
+      "ins_code": "33808206014018431",
+      "symbol": "سمازن",
+      "company_name": "سيمان‌مازندران‌",
+      "instrument_id": "IRO1SMAZ0001",
+      "rank": 38
+    },
+    {
+      "ins_code": "49054891736433700",
+      "symbol": "دعبيد",
+      "company_name": "لابراتوارداروسازي‌  دكترعبيدي‌",
+      "instrument_id": "IRO1ABDI0001",
+      "rank": 39
+    },
+    {
+      "ins_code": "44549439964296944",
+      "symbol": "كالا",
+      "company_name": "بورس كالاي ايران",
+      "instrument_id": "IRO1KALA0001",
+      "rank": 40
+    },
+    {
+      "ins_code": "48990026850202503",
+      "symbol": "خگستر",
+      "company_name": "گسترش‌سرمايه‌گذاري‌ايران‌خودرو",
+      "instrument_id": "IRO1GOST0001",
+      "rank": 41
+    },
+    {
+      "ins_code": "28147934478934110",
+      "symbol": "فغدير",
+      "company_name": "آهن و فولاد غدير ايرانيان",
+      "instrument_id": "IRO3GIRZ0001",
+      "rank": 42
+    },
+    {
+      "ins_code": "22811176775480091",
+      "symbol": "اخابر",
+      "company_name": "مخابرات ايران",
+      "instrument_id": "IRO1MKBT0001",
+      "rank": 43
+    },
+    {
+      "ins_code": "39485921411827022",
+      "symbol": "لبن",
+      "company_name": "صنايع دامپروري و لبني رضوي",
+      "instrument_id": "IRO3LABN0001",
+      "rank": 44
+    },
+    {
+      "ins_code": "37284308569715577",
+      "symbol": "فسبزوار",
+      "company_name": "پارس فولاد سبزوار",
+      "instrument_id": "IRO1FSBZ0001",
+      "rank": 45
+    },
+    {
+      "ins_code": "37614886280396031",
+      "symbol": "وساپا",
+      "company_name": "سرمايه‌گذاري‌ سايپا",
+      "instrument_id": "IRO1SSAP0001",
+      "rank": 46
+    },
+    {
+      "ins_code": "66726992874614788",
+      "symbol": "دتوزيع",
+      "company_name": "توزيع دارو پخش",
+      "instrument_id": "IRO3DPDZ0001",
+      "rank": 47
+    },
+    {
+      "ins_code": "69540585676934415",
+      "symbol": "ددانا",
+      "company_name": "داروسازي دانا",
+      "instrument_id": "IRO3DPHZ0001",
+      "rank": 48
+    },
+    {
+      "ins_code": "30829203706095076",
+      "symbol": "ستران",
+      "company_name": "سيمان‌ تهران‌",
+      "instrument_id": "IRO1STEH0001",
+      "rank": 49
+    },
+    {
+      "ins_code": "58356374066358100",
+      "symbol": "اروند",
+      "company_name": "پتروشيمي اروند",
+      "instrument_id": "IRO1RVND0001",
+      "rank": 50
+    },
+    {
+      "ins_code": "26997316501080743",
+      "symbol": "سشرق",
+      "company_name": "سيمان‌ شرق‌",
+      "instrument_id": "IRO1SSHR0001",
+      "rank": 51
+    },
+    {
+      "ins_code": "42387718866026650",
+      "symbol": "غبشهر",
+      "company_name": "صنعتي‌ بهشهر",
+      "instrument_id": "IRO1SBEH0001",
+      "rank": 52
+    },
+    {
+      "ins_code": "61310599391543522",
+      "symbol": "سباقر",
+      "company_name": "سيمان باقران",
+      "instrument_id": "IRO3CBBP0001",
+      "rank": 53
+    },
+    {
+      "ins_code": "65122215875355555",
+      "symbol": "شفن",
+      "company_name": "پتروشيمي فناوران",
+      "instrument_id": "IRO1PFAN0001",
+      "rank": 54
+    },
+    {
+      "ins_code": "5286237676293152",
+      "symbol": "سيسكو",
+      "company_name": "فولاد سيرجان ايرانيان",
+      "instrument_id": "IRO1SSCO0001",
+      "rank": 55
+    },
+    {
+      "ins_code": "60235881999727383",
+      "symbol": "آكو",
+      "company_name": "آكو باتري ايرانيان",
+      "instrument_id": "IRO1ACCO0001",
+      "rank": 56
+    },
+    {
+      "ins_code": "48010225447410247",
+      "symbol": "وبانك",
+      "company_name": "سرمايه گذاري گروه توسعه ملي",
+      "instrument_id": "IRO1BANK0001",
+      "rank": 57
+    },
+    {
+      "ins_code": "57848902730525508",
+      "symbol": "شكيميا",
+      "company_name": "كيميا پلي استر قم",
+      "instrument_id": "IRO3POLQ0001",
+      "rank": 58
+    },
+    {
+      "ins_code": "21772258644715569",
+      "symbol": "شغدير",
+      "company_name": "پتروشيمي غدير",
+      "instrument_id": "IRO1PGDR0001",
+      "rank": 59
+    },
+    {
+      "ins_code": "20865316761157979",
+      "symbol": "فاراك",
+      "company_name": "ماشين‌ سازي‌ اراك‌",
+      "instrument_id": "IRO1MARK0001",
+      "rank": 60
+    },
+    {
+      "ins_code": "64973252728260903",
+      "symbol": "وكبهمن",
+      "company_name": "مديريت سرمايه گذاري كوثربهمن",
+      "instrument_id": "IRO3KBIZ0001",
+      "rank": 61
+    },
+    {
+      "ins_code": "23441366113375722",
+      "symbol": "پارسان",
+      "company_name": "گسترش نفت و گاز پارسيان",
+      "instrument_id": "IRO1PASN0001",
+      "rank": 62
+    },
+    {
+      "ins_code": "22312990497291517",
+      "symbol": "سامان",
+      "company_name": "بانك سامان",
+      "instrument_id": "IRO3BSAP0001",
+      "rank": 63
+    },
+    {
+      "ins_code": "15521712617204216",
+      "symbol": "سفارس",
+      "company_name": "سيمان فارس و خوزستان",
+      "instrument_id": "IRO1SFKZ0001",
+      "rank": 64
+    },
+    {
+      "ins_code": "21003176534704369",
+      "symbol": "فوكا",
+      "company_name": "فولاد كاويان",
+      "instrument_id": "IRO3FVAP0001",
+      "rank": 65
+    },
+    {
+      "ins_code": "22645269567765904",
+      "symbol": "خيمن",
+      "company_name": "ايمن خودرو شرق",
+      "instrument_id": "IRO3IKSZ0001",
+      "rank": 66
+    },
+    {
+      "ins_code": "41379697187196382",
+      "symbol": "وشهر",
+      "company_name": "بانك شهر",
+      "instrument_id": "IRO7BSHP0001",
+      "rank": 67
+    },
+    {
+      "ins_code": "19239905145688600",
+      "symbol": "منجيل",
+      "company_name": "توليد نيروي برق سبز منجيل",
+      "instrument_id": "IRO3MNJZ0001",
+      "rank": 68
+    },
+    {
+      "ins_code": "14800142337291217",
+      "symbol": "فولاي",
+      "company_name": "صنايع فولاد آلياژي يزد",
+      "instrument_id": "IRO3FAYZ0001",
+      "rank": 69
+    },
+    {
+      "ins_code": "2589887561569709",
+      "symbol": "خزاميا",
+      "company_name": "زامياد",
+      "instrument_id": "IRO1ZMYD0001",
+      "rank": 70
+    },
+    {
+      "ins_code": "62404730109947970",
+      "symbol": "غكورش",
+      "company_name": "صنعت غذايي كورش",
+      "instrument_id": "IRO1KRSH0001",
+      "rank": 71
+    },
+    {
+      "ins_code": "33441514568901717",
+      "symbol": "ميدكو",
+      "company_name": "توسعه معادن وص.معدني خاورميانه",
+      "instrument_id": "IRO1MDKO0001",
+      "rank": 72
+    },
+    {
+      "ins_code": "28809886765682162",
+      "symbol": "حفاري",
+      "company_name": "حفاري شمال",
+      "instrument_id": "IRO1HSHM0001",
+      "rank": 73
+    },
+    {
+      "ins_code": "4384288570322406",
+      "symbol": "دلر",
+      "company_name": "داروسازي‌ اكسير",
+      "instrument_id": "IRO1EXIR0001",
+      "rank": 74
+    },
+    {
+      "ins_code": "15949743338644220",
+      "symbol": "ساروم",
+      "company_name": "سيمان‌اروميه‌",
+      "instrument_id": "IRO1SURO0001",
+      "rank": 75
+    },
+    {
+      "ins_code": "67126881188552864",
+      "symbol": "رمپنا",
+      "company_name": "گروه مپنا (سهامي عام)",
+      "instrument_id": "IRO1MAPN0001",
+      "rank": 76
+    },
+    {
+      "ins_code": "40467386864240950",
+      "symbol": "فكور",
+      "company_name": "مهندسي فكورصنعت تهران",
+      "instrument_id": "IRO3FSTZ0001",
+      "rank": 77
+    },
+    {
+      "ins_code": "7235435095059069",
+      "symbol": "پكوير",
+      "company_name": "كوير تاير",
+      "instrument_id": "IRO1KVRZ0001",
+      "rank": 78
+    },
+    {
+      "ins_code": "1301069819790264",
+      "symbol": "تجلي",
+      "company_name": "تجلي توسعه معادن و فلزات",
+      "instrument_id": "IRO3TMMZ0001",
+      "rank": 79
+    },
+    {
+      "ins_code": "64298008532791199",
+      "symbol": "ساينا",
+      "company_name": "صنايع بهداشتي ساينا",
+      "instrument_id": "IRO3SYNZ0001",
+      "rank": 80
+    },
+    {
+      "ins_code": "10979459081222858",
+      "symbol": "فپرديس",
+      "company_name": "صنعت تجارت پرديس آذربايجان",
+      "instrument_id": "IRO3PRDT0001",
+      "rank": 81
+    },
+    {
+      "ins_code": "34557241988629814",
+      "symbol": "بركت",
+      "company_name": "گروه دارويي بركت",
+      "instrument_id": "IRO1BRKT0001",
+      "rank": 82
+    },
+    {
+      "ins_code": "66416853783916493",
+      "symbol": "دي",
+      "company_name": "بانك دي",
+      "instrument_id": "IRO7BDYZ0001",
+      "rank": 83
+    },
+    {
+      "ins_code": "28431095903407567",
+      "symbol": "كاسپين",
+      "company_name": "داروسازي كاسپين تامين",
+      "instrument_id": "IRO3KSPZ0001",
+      "rank": 84
+    },
+    {
+      "ins_code": "46752599569017089",
+      "symbol": "بترانس",
+      "company_name": "ايران‌ ترانسفو",
+      "instrument_id": "IRO1TRNS0001",
+      "rank": 85
+    },
+    {
+      "ins_code": "60350996279289099",
+      "symbol": "كاوه",
+      "company_name": "فولاد كاوه جنوب كيش",
+      "instrument_id": "IRO1KVEH0001",
+      "rank": 86
+    },
+    {
+      "ins_code": "69143674941561637",
+      "symbol": "پترول",
+      "company_name": "گ.س.وت.ص.پتروشيمي خليج فارس",
+      "instrument_id": "IRO1IPTR0001",
+      "rank": 87
+    },
+    {
+      "ins_code": "70474983732269112",
+      "symbol": "دپارس",
+      "company_name": "پارس‌ دارو",
+      "instrument_id": "IRO1PDRO0001",
+      "rank": 88
+    },
+    {
+      "ins_code": "17284166795866794",
+      "symbol": "واحيا",
+      "company_name": "م .صنايع و معادن احياء سپاهان",
+      "instrument_id": "IRO7VHYP0001",
+      "rank": 89
+    },
+    {
+      "ins_code": "66772024744156373",
+      "symbol": "فباهنر",
+      "company_name": "مس‌ شهيدباهنر",
+      "instrument_id": "IRO1BAHN0001",
+      "rank": 90
+    },
+    {
+      "ins_code": "43362635835198978",
+      "symbol": "هاي وب",
+      "company_name": "داده گسترعصرنوين-هاي وب",
+      "instrument_id": "IRO1HWEB0001",
+      "rank": 91
+    },
+    {
+      "ins_code": "47232550823972469",
+      "symbol": "وتوكا",
+      "company_name": "سرمايه‌گذاري‌توكافولاد(هلدينگ",
+      "instrument_id": "IRO1TOKA0001",
+      "rank": 92
+    },
+    {
+      "ins_code": "14427168056799610",
+      "symbol": "كيميا",
+      "company_name": "ص. معدني كيمياي زنجان گستران",
+      "instrument_id": "IRO1KZGZ0001",
+      "rank": 93
+    },
+    {
+      "ins_code": "66790687790437196",
+      "symbol": "وگردش",
+      "company_name": "بانك گردشگري",
+      "instrument_id": "IRO3GRDZ0001",
+      "rank": 94
+    },
+    {
+      "ins_code": "29122854902865456",
+      "symbol": "كسعدي",
+      "company_name": "كاشي‌ سعدي‌",
+      "instrument_id": "IRO1KSAD0001",
+      "rank": 95
+    },
+    {
+      "ins_code": "13227300125161435",
+      "symbol": "سصوفي",
+      "company_name": "سيمان‌ صوفيان‌",
+      "instrument_id": "IRO1SSOF0001",
+      "rank": 96
+    },
+    {
+      "ins_code": "5564768007356822",
+      "symbol": "حريل",
+      "company_name": "ريل پردازسير",
+      "instrument_id": "IRO3HRLZ0001",
+      "rank": 97
+    },
+    {
+      "ins_code": "37842793167868642",
+      "symbol": "غويتا",
+      "company_name": "ويتانا",
+      "instrument_id": "IRO3VITZ0001",
+      "rank": 98
+    },
+    {
+      "ins_code": "37204371816016200",
+      "symbol": "وصندوق",
+      "company_name": "سرمايه‌گذاري‌صندوق‌بازنشستگي‌",
+      "instrument_id": "IRO1SAND0001",
+      "rank": 99
+    },
+    {
+      "ins_code": "29758477602878557",
+      "symbol": "تيپيكو",
+      "company_name": "سرمايه گذاري دارويي تامين",
+      "instrument_id": "IRO1DTIP0001",
+      "rank": 100
+    }
+  ]
+}
